@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Partenaires — UMMISCO</title>
+  <link rel="stylesheet" href="../css/global.css"/>
+  <style>
+    .partner-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+    @media(max-width:768px) { .partner-grid { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:480px) { .partner-grid { grid-template-columns: 1fr; } }
+
+    .partner-card {
+      background: #fff;
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+      transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+    }
+    .partner-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-3px);
+      border-color: var(--c-primary);
+    }
+    .partner-card-logo {
+      height: 80px;
+      width: auto;
+      max-width: 180px;
+      object-fit: contain;
+    }
+    .partner-card-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--c-primary);
+    }
+    .partner-card-desc {
+      font-size: 13px;
+      color: var(--c-text2);
+      line-height: 1.6;
+    }
+    .partner-card-type {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-header-inst">
+  <div class="container">
+    <h1>Partenaires</h1>
+    <p>Nos partenaires académiques et institutionnels</p>
+  </div>
+</div>
+
+<div style="padding:48px 0 64px">
+  <div class="container">
+
+    <div class="section-title" style="margin-bottom:32px">
+      <div class="section-title-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <h2>Nos partenaires</h2>
+      <div class="section-title-bar"></div>
+    </div>
+
+    <div class="partner-grid">
+
+      <!-- UMMISCO -->
+      <div class="partner-card">
+        <img src="../images/logo-ummisco.png" alt="UMMISCO" class="partner-card-logo"/>
+        <div>
+          <div class="partner-card-name">UMMISCO</div>
+          <div style="margin:6px 0"><span class="partner-card-type" style="background:#dbeafe;color:#1e40af">Institutionnel</span></div>
+          <div class="partner-card-desc">Unité Mixte Internationale de Modélisation Mathématique et Informatique des Systèmes Complexes — IRD/UCAD.</div>
+        </div>
+        <a href="https://ummisco.ird.fr" target="_blank" class="btn btn--outline btn--sm">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Visiter
+        </a>
+      </div>
+
+      <!-- ESP -->
+      <div class="partner-card">
+        <img src="../images/esp.jpg" alt="ESP Dakar" class="partner-card-logo"/>
+        <div>
+          <div class="partner-card-name">ESP — École Supérieure Polytechnique</div>
+          <div style="margin:6px 0"><span class="partner-card-type" style="background:#d1fae5;color:#065f46">Académique</span></div>
+          <div class="partner-card-desc">École d'ingénieurs de l'Université Cheikh Anta Diop de Dakar. Structure d'accueil principale de l'UMMISCO au Sénégal.</div>
+        </div>
+        <a href="https://esp.ucad.sn" target="_blank" class="btn btn--outline btn--sm">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Visiter
+        </a>
+      </div>
+
+      <!-- UCAD -->
+      <div class="partner-card">
+        <img src="../images/logo-ucad.png" alt="UCAD" class="partner-card-logo"/>
+        <div>
+          <div class="partner-card-name">UCAD — Université Cheikh Anta Diop</div>
+          <div style="margin:6px 0"><span class="partner-card-type" style="background:#d1fae5;color:#065f46">Académique</span></div>
+          <div class="partner-card-desc">Première université du Sénégal, fondée en 1957 à Dakar. Tutelle principale de l'UMMISCO au niveau national.</div>
+        </div>
+        <a href="https://ucad.sn" target="_blank" class="btn btn--outline btn--sm">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Visiter
+        </a>
+      </div>
+
+      <!-- IRD -->
+      <div class="partner-card">
+        <img src="../images/ird.png" alt="IRD" class="partner-card-logo"/>
+        <div>
+          <div class="partner-card-name">IRD — Institut de Recherche pour le Développement</div>
+          <div style="margin:6px 0"><span class="partner-card-type" style="background:#dbeafe;color:#1e40af">Institutionnel</span></div>
+          <div class="partner-card-desc">Organisme français de recherche pour le développement. Co-tutelle internationale de l'UMMISCO avec l'UCAD.</div>
+        </div>
+        <a href="https://ird.fr" target="_blank" class="btn btn--outline btn--sm">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Visiter
+        </a>
+      </div>
+
+      <!-- UGB -->
+      <div class="partner-card">
+        <img src="../images/ugb.jpg" alt="UGB" class="partner-card-logo"/>
+        <div>
+          <div class="partner-card-name">UGB — Université Gaston Berger</div>
+          <div style="margin:6px 0"><span class="partner-card-type" style="background:#d1fae5;color:#065f46">Académique</span></div>
+          <div class="partner-card-desc">Université publique sénégalaise de Saint-Louis, partenaire de recherche de l'UMMISCO sur plusieurs projets scientifiques.</div>
+        </div>
+        <a href="https://ugb.edu.sn" target="_blank" class="btn btn--outline btn--sm">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Visiter
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/nav.js"></script>
+<script>initNav({ active:'unite', base:'../' }); initFooter({ base:'../' });</script>
+<script src="../js/i18n.js"></script>
+</body>
+</html>

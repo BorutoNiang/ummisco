@@ -1,0 +1,244 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bailleurs — UMMISCO Admin</title>
+  <link rel="stylesheet" href="../../css/global.css"/>
+  <style>
+    .tab-bar { display:flex; gap:4px; margin-bottom:28px; border-bottom:1px solid var(--c-border); }
+    .tab-btn { padding:10px 18px; font-size:14px; font-weight:500; cursor:pointer; color:var(--c-text2); border-bottom:2px solid transparent; margin-bottom:-1px; transition:all var(--transition); }
+    .tab-btn.active { color:var(--c-accent); border-bottom-color:var(--c-accent); }
+    .toolbar { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+    .search-box { flex:1; min-width:200px; background:var(--c-surface); border:1px solid var(--c-border); border-radius:var(--radius-md); padding:9px 14px; font-size:14px; color:var(--c-text); }
+    .search-box:focus { border-color:var(--c-primary); outline:none; }
+    .bailleur-card {
+      background:var(--c-surface); border:1px solid var(--c-border);
+      border-radius:var(--radius-lg); padding:22px;
+      display:flex; align-items:center; gap:16px;
+      transition:all var(--transition);
+    }
+    .bailleur-card:hover { border-color:var(--c-border2); }
+    .b-logo {
+      width:52px; height:52px; border-radius:var(--radius-md);
+      background:var(--c-surface2); display:flex; align-items:center;
+      justify-content:center; font-size:22px; flex-shrink:0;
+    }
+    .b-name  { font-weight:600; font-size:15px; }
+    .b-meta  { font-size:13px; color:var(--c-text3); margin-top:2px; }
+    .b-actions { display:flex; gap:6px; margin-left:auto; }
+    .del-statut {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:3px 10px; border-radius:100px; font-size:11px; font-weight:500;
+    }
+    .s-en_cours{ background:rgba(59,130,246,.12); color:var(--c-primary); }
+    .s-soumis  { background:rgba(245,158,11,.12);  color:var(--c-warn); }
+    .s-accepte { background:rgba(6,214,160,.12);   color:var(--c-accent); }
+    .s-rejete  { background:rgba(239,68,68,.12);   color:var(--c-danger); }
+  </style>
+</head>
+<body>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('bailleurs',this)">Bailleurs</button>
+  <button class="tab-btn" onclick="switchTab('delivrables',this)">Délivrables</button>
+</div>
+
+<!-- ── BAILLEURS ── -->
+<div id="view-bailleurs">
+  <div class="toolbar">
+    <input class="search-box" type="search" id="b-search" placeholder="Rechercher un bailleur…" oninput="renderBailleurs()"/>
+    <button class="btn btn--accent" onclick="openBailleurModal()">+ Nouveau bailleur</button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:12px" id="bailleurs-list">
+    <div class="skeleton" style="height:80px;border-radius:var(--radius-lg)"></div>
+    <div class="skeleton" style="height:80px;border-radius:var(--radius-lg)"></div>
+  </div>
+</div>
+
+<!-- ── DÉLIVRABLES ── -->
+<div id="view-delivrables" style="display:none">
+  <div class="toolbar">
+    <input class="search-box" type="search" id="d-search" placeholder="Rechercher un délivrable…" oninput="renderDelivrables()"/>
+    <select class="filter-select" id="d-statut" onchange="renderDelivrables()" style="background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius-md);padding:9px 14px;font-size:14px;color:var(--c-text)">
+      <option value="">Tous les statuts</option>
+      <option value="en_cours">En cours</option>
+      <option value="soumis">Soumis</option>
+      <option value="accepte">Accepté</option>
+      <option value="rejete">Rejeté</option>
+    </select>
+    <button class="btn btn--accent" onclick="openDelivrableModal()">+ Nouveau délivrable</button>
+  </div>
+  <div class="card" style="padding:0">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Titre</th><th>Projet</th><th>Bailleur</th><th>Échéance</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="delivrables-tbody">
+          <tr><td colspan="6" style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal bailleur -->
+<div class="modal-overlay" id="modal-b">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title" id="b-modal-title">Nouveau bailleur</span>
+      <div class="modal-close" onclick="closeBModal()">✕</div>
+    </div>
+    <form id="b-form" class="gap-form">
+      <div class="form-group"><label class="form-label">Nom *</label><input class="form-input" id="b-nom" required placeholder="Nom du bailleur"/></div>
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label">Pays</label><input class="form-input" id="b-pays" placeholder="Ex: France"/></div>
+        <div class="form-group"><label class="form-label">Contact</label><input class="form-input" id="b-contact" placeholder="email@bailleur.org"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Site web</label><input class="form-input" id="b-site" type="url" placeholder="https://…"/></div>
+      <div id="b-alert"></div>
+      <div class="flex" style="gap:10px;justify-content:flex-end">
+        <button type="button" class="btn btn--ghost" onclick="closeBModal()">Annuler</button>
+        <button type="submit" class="btn btn--accent">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal delivrable -->
+<div class="modal-overlay" id="modal-d">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title">Nouveau délivrable</span>
+      <div class="modal-close" onclick="closeDModal()">✕</div>
+    </div>
+    <form id="d-form" class="gap-form">
+      <div class="form-group"><label class="form-label">Titre *</label><input class="form-input" id="d-titre" required placeholder="Titre du délivrable"/></div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Projet *</label>
+          <select class="form-input" id="d-projet" required><option value="">— Sélectionner —</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bailleur</label>
+          <select class="form-input" id="d-bailleur"><option value="">— Aucun —</option></select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label">Échéance</label><input class="form-input" id="d-echeance" type="date"/></div>
+        <div class="form-group">
+          <label class="form-label">Statut</label>
+          <select class="form-input" id="d-statut2">
+            <option value="en_cours">En cours</option>
+            <option value="soumis">Soumis</option>
+            <option value="accepte">Accepté</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="d-desc" rows="3" placeholder="Description…"></textarea></div>
+      <div id="d-alert"></div>
+      <div class="flex" style="gap:10px;justify-content:flex-end">
+        <button type="button" class="btn btn--ghost" onclick="closeDModal()">Annuler</button>
+        <button type="submit" class="btn btn--accent">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/admin-layout.js"></script>
+<script>
+initAdminLayout('bailleurs');
+
+let bailleurs=[], delivrables=[], projets=[];
+
+async function init(){
+  [bailleurs, delivrables, projets] = await Promise.all([
+    api.get('/bailleurs/').catch(()=>[]),
+    api.get('/delivrables/').catch(()=>[]),
+    api.get('/projets/?limit=200').catch(()=>[]),
+  ]);
+  projets.forEach(p=>{ document.getElementById('d-projet').innerHTML+=`<option value="${p.id}">${p.titre}</option>`; });
+  bailleurs.forEach(b=>{ document.getElementById('d-bailleur').innerHTML+=`<option value="${b.id}">${b.nom}</option>`; });
+  renderBailleurs(); renderDelivrables();
+}
+
+function switchTab(tab, btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+  document.getElementById('view-bailleurs').style.display  = tab==='bailleurs'  ? '' : 'none';
+  document.getElementById('view-delivrables').style.display= tab==='delivrables'? '' : 'none';
+}
+
+function renderBailleurs(){
+  const q=document.getElementById('b-search').value.toLowerCase();
+  const filtered=bailleurs.filter(b=>!q||b.nom.toLowerCase().includes(q));
+  const list=document.getElementById('bailleurs-list');
+  list.innerHTML=filtered.length?filtered.map(b=>`
+    <div class="bailleur-card">
+      <div class="b-logo">💰</div>
+      <div>
+        <div class="b-name">${b.nom}</div>
+        <div class="b-meta">${[b.pays,b.contact].filter(Boolean).join(' · ')}</div>
+      </div>
+      <div class="b-actions">
+        ${b.site_web?`<a href="${b.site_web}" target="_blank" class="btn btn--ghost btn--sm">↗</a>`:''}
+        <button class="btn btn--sm btn--danger" onclick="deleteBailleur(${b.id})">Supprimer</button>
+      </div>
+    </div>
+  `).join(''):'<p class="text-muted" style="text-align:center;padding:40px">Aucun bailleur</p>';
+}
+
+function renderDelivrables(){
+  const q=document.getElementById('d-search').value.toLowerCase();
+  const s=document.getElementById('d-statut').value;
+  const filtered=delivrables.filter(d=>(!q||d.titre.toLowerCase().includes(q))&&(!s||d.statut===s));
+  const tbody=document.getElementById('delivrables-tbody');
+  tbody.innerHTML=filtered.length?filtered.map(d=>`
+    <tr>
+      <td style="font-weight:500;font-size:14px">${truncate(d.titre,60)}</td>
+      <td style="font-size:13px;color:var(--c-text2)">—</td>
+      <td style="font-size:13px">${d.bailleur?.nom||'—'}</td>
+      <td><span class="font-mono" style="font-size:11px;color:var(--c-text3)">${formatDate(d.echeance)}</span></td>
+      <td><span class="del-statut s-${d.statut}">${d.statut.replace('_',' ')}</span></td>
+      <td>
+        <div style="display:flex;gap:6px">
+          ${d.fichier_path?`<a class="btn btn--ghost btn--sm" href="${d.fichier_path}" target="_blank">Télécharger</a>`:''}
+          <button class="btn btn--sm btn--danger" onclick="deleteDelivrable(${d.id})">Supprimer</button>
+        </div>
+      </td>
+    </tr>
+  `).join(''):'<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--c-text3)">Aucun délivrable</td></tr>';
+}
+
+function openBailleurModal(){ document.getElementById('b-alert').innerHTML=''; document.getElementById('b-form').reset(); document.getElementById('modal-b').classList.add('open'); }
+function closeBModal(){ document.getElementById('modal-b').classList.remove('open'); }
+
+document.getElementById('b-form').addEventListener('submit',async(e)=>{
+  e.preventDefault();
+  try{
+    const b=await api.post('/bailleurs/',{ nom:document.getElementById('b-nom').value, pays:document.getElementById('b-pays').value||null, contact:document.getElementById('b-contact').value||null, site_web:document.getElementById('b-site').value||null });
+    bailleurs.push(b); document.getElementById('d-bailleur').innerHTML+=`<option value="${b.id}">${b.nom}</option>`;
+    Toast.success('Bailleur ajouté'); closeBModal(); renderBailleurs();
+  }catch(err){ document.getElementById('b-alert').innerHTML=`<div class="alert alert--error">${err.message}</div>`; }
+});
+
+async function deleteBailleur(id){ if(!confirm('Supprimer ce bailleur ?')) return; try{ await api.delete(`/bailleurs/${id}`); bailleurs=bailleurs.filter(b=>b.id!==id); renderBailleurs(); Toast.success('Supprimé'); }catch(e){Toast.error(e.message);} }
+
+function openDelivrableModal(){ document.getElementById('d-alert').innerHTML=''; document.getElementById('d-form').reset(); document.getElementById('modal-d').classList.add('open'); }
+function closeDModal(){ document.getElementById('modal-d').classList.remove('open'); }
+
+document.getElementById('d-form').addEventListener('submit',async(e)=>{
+  e.preventDefault();
+  try{
+    const d=await api.post('/delivrables/',{ titre:document.getElementById('d-titre').value, projet_id:+document.getElementById('d-projet').value, bailleur_id:document.getElementById('d-bailleur').value?+document.getElementById('d-bailleur').value:null, echeance:document.getElementById('d-echeance').value||null, description:document.getElementById('d-desc').value||null });
+    delivrables.push(d); Toast.success('Délivrable créé'); closeDModal(); renderDelivrables();
+  }catch(err){ document.getElementById('d-alert').innerHTML=`<div class="alert alert--error">${err.message}</div>`; }
+});
+
+async function deleteDelivrable(id){ if(!confirm('Supprimer ?')) return; try{ await api.delete(`/delivrables/${id}`); delivrables=delivrables.filter(d=>d.id!==id); renderDelivrables(); Toast.success('Supprimé'); }catch(e){Toast.error(e.message);} }
+
+document.getElementById('modal-b').addEventListener('click',e=>{if(e.target.id==='modal-b')closeBModal();});
+document.getElementById('modal-d').addEventListener('click',e=>{if(e.target.id==='modal-d')closeDModal();});
+init();
+</script>
+</body>
+</html>

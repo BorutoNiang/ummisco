@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Utilisateurs — UMMISCO Admin</title>
+  <link rel="stylesheet" href="../../css/global.css"/>
+  <style>
+    .toolbar { display:flex; align-items:center; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+    .search-box {
+      flex:1; min-width:220px; background:var(--c-surface);
+      border:1px solid var(--c-border); border-radius:var(--radius-md);
+      padding:9px 14px; font-size:14px; color:var(--c-text);
+    }
+    .search-box:focus { border-color:var(--c-primary); outline:none; }
+    .filter-select {
+      background:var(--c-surface); border:1px solid var(--c-border);
+      border-radius:var(--radius-md); padding:9px 14px; font-size:14px; color:var(--c-text); cursor:pointer;
+    }
+    .u-avatar {
+      width:36px; height:36px; border-radius:50%;
+      background:linear-gradient(135deg,var(--c-primary),var(--c-accent));
+      display:flex; align-items:center; justify-content:center;
+      font-size:13px; font-weight:700; flex-shrink:0;
+    }
+    .u-name { font-weight:500; font-size:14px; }
+    .u-email { font-size:12px; color:var(--c-text3); }
+    .u-cell { display:flex; align-items:center; gap:10px; }
+    .actions-cell { display:flex; gap:6px; }
+    .statut-actif    { color:var(--c-accent); }
+    .statut-suspendu { color:var(--c-danger); }
+    .statut-inactif  { color:var(--c-text3); }
+  </style>
+</head>
+<body>
+
+<div class="toolbar">
+  <input class="search-box" type="search" placeholder="Rechercher un utilisateur…" id="search" oninput="renderTable()"/>
+  <select class="filter-select" id="filter-role" onchange="renderTable()">
+    <option value="">Tous les rôles</option>
+  </select>
+  <select class="filter-select" id="filter-statut" onchange="renderTable()">
+    <option value="">Tous les statuts</option>
+    <option value="actif">Actif</option>
+    <option value="inactif">Inactif</option>
+    <option value="suspendu">Suspendu</option>
+  </select>
+  <button class="btn btn--accent" onclick="openModal()">+ Nouvel utilisateur</button>
+</div>
+
+<div class="card" style="padding:0">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Utilisateur</th>
+          <th>Rôle</th>
+          <th>Statut</th>
+          <th>Langue</th>
+          <th>Inscrit le</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="users-tbody">
+        <tr><td colspan="6" style="text-align:center;padding:32px">
+          <div class="spinner" style="margin:0 auto"></div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Nouvel utilisateur</span>
+      <div class="modal-close" onclick="closeModal()">✕</div>
+    </div>
+    <form id="user-form" class="gap-form">
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Prénom *</label>
+          <input class="form-input" id="f-prenom" required placeholder="Prénom"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nom *</label>
+          <input class="form-input" id="f-nom" required placeholder="Nom"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email *</label>
+        <input class="form-input" id="f-email" type="email" required placeholder="email@ucad.sn"/>
+      </div>
+      <div id="pwd-group" class="form-group">
+        <label class="form-label">Mot de passe *</label>
+        <input class="form-input" id="f-password" type="password" placeholder="8 caractères minimum"/>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Rôle *</label>
+          <select class="form-input" id="f-role" required>
+            <option value="">— Sélectionner —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Statut</label>
+          <select class="form-input" id="f-statut">
+            <option value="actif">Actif</option>
+            <option value="inactif">Inactif</option>
+            <option value="suspendu">Suspendu</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Biographie</label>
+        <textarea class="form-input" id="f-bio" rows="3" placeholder="Courte biographie…"></textarea>
+      </div>
+      <div id="form-alert"></div>
+      <div class="flex" style="gap:10px;justify-content:flex-end">
+        <button type="button" class="btn btn--ghost" onclick="closeModal()">Annuler</button>
+        <button type="submit" class="btn btn--accent" id="form-submit">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/admin-layout.js"></script>
+<script>
+initAdminLayout('utilisateurs');
+requireAuth(['super_admin']);
+
+let allUsers = [];
+let roles    = [];
+let editId   = null;
+
+async function init() {
+  [allUsers, roles] = await Promise.all([
+    api.get('/utilisateurs/?limit=200').catch(()=>[]),
+    api.get('/admin/roles').catch(()=>[]),
+  ]);
+
+  const filterRole = document.getElementById('filter-role');
+  const formRole   = document.getElementById('f-role');
+  roles.forEach(r => {
+    filterRole.innerHTML += `<option value="${r.libelle}">${r.libelle}</option>`;
+    formRole.innerHTML   += `<option value="${r.id}">${r.libelle}</option>`;
+  });
+  renderTable();
+}
+
+function renderTable() {
+  const q      = document.getElementById('search').value.toLowerCase();
+  const fRole  = document.getElementById('filter-role').value;
+  const fStat  = document.getElementById('filter-statut').value;
+
+  const filtered = allUsers.filter(u =>
+    (!q    || `${u.nom} ${u.prenom} ${u.email}`.toLowerCase().includes(q)) &&
+    (!fRole|| u.role?.libelle === fRole) &&
+    (!fStat|| u.statut === fStat)
+  );
+
+  const tbody = document.getElementById('users-tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--c-text3)">Aucun utilisateur trouvé</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(u => `
+    <tr>
+      <td>
+        <div class="u-cell">
+          <div class="u-avatar">${avatarInitials(u.nom, u.prenom)}</div>
+          <div>
+            <div class="u-name">${u.prenom} ${u.nom}</div>
+            <div class="u-email">${u.email}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="badge badge--protege" style="font-size:11px">${u.role?.libelle||'—'}</span></td>
+      <td><span class="statut-${u.statut}" style="font-size:13px;font-weight:500">● ${u.statut}</span></td>
+      <td><span class="font-mono" style="font-size:12px;color:var(--c-text3)">${u.langue?.toUpperCase()||'FR'}</span></td>
+      <td><span class="font-mono" style="font-size:11px;color:var(--c-text3)">${formatDate(u.created_at)}</span></td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn btn--ghost btn--sm" onclick="openModal(${u.id})">Modifier</button>
+          <button class="btn btn--sm btn--danger" onclick="deleteUser(${u.id})">Supprimer</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openModal(id = null) {
+  editId = id;
+  document.getElementById('modal-title').textContent = id ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur';
+  document.getElementById('form-alert').innerHTML = '';
+  document.getElementById('user-form').reset();
+  document.getElementById('pwd-group').style.display = id ? 'none' : '';
+
+  if (id) {
+    const u = allUsers.find(x => x.id === id);
+    if (u) {
+      document.getElementById('f-prenom').value = u.prenom;
+      document.getElementById('f-nom').value    = u.nom;
+      document.getElementById('f-email').value  = u.email;
+      document.getElementById('f-statut').value = u.statut;
+      document.getElementById('f-bio').value    = u.bio || '';
+      const roleOpt = Array.from(document.getElementById('f-role').options)
+        .find(o => roles.find(r => r.id === +o.value && r.libelle === u.role?.libelle));
+      if (roleOpt) document.getElementById('f-role').value = roleOpt.value;
+    }
+  }
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); editId = null; }
+
+document.getElementById('user-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('form-submit');
+  btn.disabled = true; btn.textContent = '…';
+
+  try {
+    if (editId) {
+      await api.patch(`/utilisateurs/${editId}`, {
+        nom:     document.getElementById('f-nom').value,
+        prenom:  document.getElementById('f-prenom').value,
+        statut:  document.getElementById('f-statut').value,
+        bio:     document.getElementById('f-bio').value || null,
+        role_id: +document.getElementById('f-role').value,
+      });
+      Toast.success('Utilisateur mis à jour');
+    } else {
+      await api.post('/utilisateurs/', {
+        nom:      document.getElementById('f-nom').value,
+        prenom:   document.getElementById('f-prenom').value,
+        email:    document.getElementById('f-email').value,
+        password: document.getElementById('f-password').value,
+        role_id:  +document.getElementById('f-role').value,
+        bio:      document.getElementById('f-bio').value || null,
+      });
+      Toast.success('Utilisateur créé');
+    }
+    closeModal();
+    const users = await api.get('/utilisateurs/?limit=200').catch(()=>[]);
+    allUsers = users;
+    renderTable();
+  } catch(err) {
+    document.getElementById('form-alert').innerHTML =
+      `<div class="alert alert--error">${err.message}</div>`;
+  }
+  btn.disabled = false; btn.textContent = 'Enregistrer';
+});
+
+async function deleteUser(id) {
+  if (!confirm('Supprimer cet utilisateur ? Cette action est irréversible.')) return;
+  try {
+    await api.delete(`/utilisateurs/${id}`);
+    Toast.success('Utilisateur supprimé');
+    allUsers = allUsers.filter(u => u.id !== id);
+    renderTable();
+  } catch(e) { Toast.error(e.message); }
+}
+
+document.getElementById('modal').addEventListener('click', e => { if(e.target.id==='modal') closeModal(); });
+init();
+</script>
+</body>
+</html>

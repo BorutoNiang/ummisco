@@ -1,0 +1,278 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Datasets — UMMISCO Admin</title>
+  <link rel="stylesheet" href="../../css/global.css"/>
+  <style>
+    .toolbar { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+    .search-box { flex:1; min-width:200px; background:var(--c-surface); border:1px solid var(--c-border); border-radius:var(--radius-md); padding:9px 14px; font-size:14px; color:var(--c-text); }
+    .search-box:focus { border-color:var(--c-primary); outline:none; }
+    .filter-select { background:var(--c-surface); border:1px solid var(--c-border); border-radius:var(--radius-md); padding:9px 14px; font-size:14px; color:var(--c-text); }
+    .upload-zone {
+      border: 2px dashed var(--c-border2);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .upload-zone:hover { border-color:var(--c-primary); background:rgba(59,130,246,.04); }
+    .upload-zone.dragover { border-color:var(--c-accent); background:rgba(6,214,160,.04); }
+    .file-size { font-family:var(--font-mono); font-size:11px; color:var(--c-text3); }
+  </style>
+</head>
+<body>
+
+<div class="toolbar">
+  <input class="search-box" type="search" id="search" placeholder="Rechercher un dataset…" oninput="renderTable()"/>
+  <select class="filter-select" id="filter-vis" onchange="renderTable()">
+    <option value="">Toutes visibilités</option>
+    <option value="public">Public</option>
+    <option value="protege">Protégé</option>
+    <option value="prive">Privé</option>
+  </select>
+  <select class="filter-select" id="filter-axe" onchange="loadData()">
+    <option value="">Tous les axes</option>
+  </select>
+  <div id="add-ds-btn"></div>
+</div>
+
+<div class="card" style="padding:0">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Titre</th><th>Propriétaire</th><th>Axe</th><th>Visibilité</th><th>Format</th><th>Taille</th><th>Licence</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="ds-tbody">
+        <tr><td colspan="8" style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Nouveau dataset</span>
+      <div class="modal-close" onclick="closeModal()">✕</div>
+    </div>
+    <form id="ds-form" class="gap-form">
+      <div class="form-group">
+        <label class="form-label">Titre *</label>
+        <input class="form-input" id="f-titre" required placeholder="Nom du dataset"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-input" id="f-desc" rows="3" placeholder="Description des données…"></textarea>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Axe thématique</label>
+          <select class="form-input" id="f-axe"><option value="">— Aucun —</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Visibilité</label>
+          <select class="form-input" id="f-vis">
+            <option value="public">Public</option>
+            <option value="protege" selected>Protégé</option>
+            <option value="prive">Privé</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Licence</label>
+          <select class="form-input" id="f-licence">
+            <option value="">— Aucune —</option>
+            <option value="CC BY 4.0">CC BY 4.0</option>
+            <option value="CC BY-SA 4.0">CC BY-SA 4.0</option>
+            <option value="CC0">CC0 (Domaine public)</option>
+            <option value="MIT">MIT</option>
+            <option value="Propriétaire">Propriétaire</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mots-clés</label>
+          <input class="form-input" id="f-mots" placeholder="climat, sénégal, ..."/>
+        </div>
+      </div>
+      <div id="upload-section">
+        <label class="form-label">Fichier</label>
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('f-file').click()">
+          <div style="font-size:32px;margin-bottom:8px">📁</div>
+          <div style="font-size:14px;font-weight:500;margin-bottom:4px">Cliquer pour uploader</div>
+          <div style="font-size:12px;color:var(--c-text3)">ou glisser-déposer</div>
+          <div style="font-size:11px;color:var(--c-text3);margin-top:8px" id="file-name">CSV, JSON, NetCDF… — max 50 Mo</div>
+        </div>
+        <input type="file" id="f-file" style="display:none" onchange="onFileSelect(this)"/>
+      </div>
+      <div id="form-alert"></div>
+      <div class="flex" style="gap:10px;justify-content:flex-end">
+        <button type="button" class="btn btn--ghost" onclick="closeModal()">Annuler</button>
+        <button type="submit" class="btn btn--accent" id="form-submit">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/admin-layout.js"></script>
+<script>
+initAdminLayout('datasets');
+
+// Afficher le bouton selon le rôle
+const _role = Auth.getRole();
+const _addDsLabel = _role === 'doctorant'
+  ? '+ Proposer un dataset <small style="color:#d97706">(privé jusqu\'à validation)</small>'
+  : '+ Nouveau dataset';
+document.getElementById('add-ds-btn').innerHTML = `<button class="btn btn--primary" onclick="openModal()">${_addDsLabel}</button>`;
+
+let allDatasets = [], axes = [], editId = null;
+
+function formatSize(bytes) {
+  if (!bytes) return '—';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(1) + ' MB';
+}
+
+async function loadData() {
+  const axeId = document.getElementById('filter-axe').value;
+  let url = '/datasets/?limit=200';
+  if (axeId) url += `&axe_id=${axeId}`;
+  allDatasets = await api.get(url).catch(()=>[]);
+  renderTable();
+}
+
+async function init() {
+  axes = await api.get('/axes/').catch(()=>[]);
+  const filterAxe = document.getElementById('filter-axe');
+  const formAxe   = document.getElementById('f-axe');
+  axes.forEach(a => {
+    filterAxe.innerHTML += `<option value="${a.id}">${a.nom}</option>`;
+    formAxe.innerHTML   += `<option value="${a.id}">${a.nom}</option>`;
+  });
+  loadData();
+}
+
+function renderTable() {
+  const q   = document.getElementById('search').value.toLowerCase();
+  const vis = document.getElementById('filter-vis').value;
+  const filtered = allDatasets.filter(d =>
+    (!q  || d.titre.toLowerCase().includes(q)) &&
+    (!vis|| d.visibilite === vis)
+  );
+  const tbody = document.getElementById('ds-tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--c-text3)">Aucun dataset</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(d => `
+    <tr>
+      <td>
+        <div style="font-weight:500;font-size:14px">${truncate(d.titre,60)}</div>
+        <div style="font-size:12px;color:var(--c-text3)">${truncate(d.mots_cles||'',50)}</div>
+      </td>
+      <td style="font-size:13px">${d.proprietaire?.prenom||''} ${d.proprietaire?.nom||''}</td>
+      <td style="font-size:12px;color:var(--c-text2)">${d.axe?.nom||'—'}</td>
+      <td>${badgeHtml(d.visibilite)}</td>
+      <td><span class="font-mono" style="font-size:12px">${d.format||'—'}</span></td>
+      <td class="file-size">${formatSize(d.taille_octets)}</td>
+      <td><span style="font-size:12px;color:var(--c-text3)">${d.licence||'—'}</span></td>
+      <td>
+        <div style="display:flex;gap:6px">
+          ${d.fichier_path ? `<a class="btn btn--ghost btn--sm" href="/uploads/${d.fichier_path}" target="_blank">Télécharger</a>` : ''}
+          <button class="btn btn--ghost btn--sm" onclick="openModal(${d.id})">Modifier</button>
+          <button class="btn btn--sm btn--danger" onclick="deleteDs(${d.id})">Supprimer</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function onFileSelect(input) {
+  if (input.files[0]) {
+    document.getElementById('file-name').textContent = `${input.files[0].name} (${formatSize(input.files[0].size)})`;
+  }
+}
+
+// Drag & drop
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+zone.addEventListener('dragleave', ()=> zone.classList.remove('dragover'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('dragover');
+  const f = e.dataTransfer.files[0];
+  if (f) { document.getElementById('f-file').files = e.dataTransfer.files; onFileSelect(document.getElementById('f-file')); }
+});
+
+function openModal(id = null) {
+  editId = id;
+  document.getElementById('modal-title').textContent = id ? 'Modifier le dataset' : 'Nouveau dataset';
+  document.getElementById('form-alert').innerHTML = '';
+  document.getElementById('ds-form').reset();
+  document.getElementById('file-name').textContent = 'CSV, JSON, NetCDF… — max 50 Mo';
+  document.getElementById('upload-section').style.display = id ? 'none' : '';
+  if (id) {
+    const d = allDatasets.find(x=>x.id===id);
+    if (d) {
+      document.getElementById('f-titre').value   = d.titre;
+      document.getElementById('f-desc').value    = d.description||'';
+      document.getElementById('f-axe').value     = d.axe?.id||'';
+      document.getElementById('f-vis').value     = d.visibilite;
+      document.getElementById('f-licence').value = d.licence||'';
+      document.getElementById('f-mots').value    = d.mots_cles||'';
+    }
+  }
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); editId=null; }
+
+document.getElementById('ds-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('form-submit');
+  btn.disabled=true; btn.textContent='…';
+  const payload = {
+    titre:       document.getElementById('f-titre').value,
+    description: document.getElementById('f-desc').value||null,
+    axe_id:      document.getElementById('f-axe').value ? +document.getElementById('f-axe').value : null,
+    visibilite:  document.getElementById('f-vis').value,
+    licence:     document.getElementById('f-licence').value||null,
+    mots_cles:   document.getElementById('f-mots').value||null,
+  };
+  try {
+    let ds;
+    if (editId) {
+      ds = await api.patch(`/datasets/${editId}`, payload);
+      Toast.success('Dataset mis à jour');
+    } else {
+      ds = await api.post('/datasets/', payload);
+      // Upload fichier si sélectionné
+      const file = document.getElementById('f-file').files[0];
+      if (file && ds?.id) {
+        const fd = new FormData(); fd.append('file', file);
+        await api.upload(`/datasets/${ds.id}/upload`, fd);
+      }
+      Toast.success('Dataset créé');
+    }
+    closeModal(); loadData();
+  } catch(err) {
+    document.getElementById('form-alert').innerHTML = `<div class="alert alert--error">${err.message}</div>`;
+  }
+  btn.disabled=false; btn.textContent='Enregistrer';
+});
+
+async function deleteDs(id) {
+  if (!confirm('Supprimer ce dataset ?')) return;
+  try { await api.delete(`/datasets/${id}`); Toast.success('Supprimé'); loadData(); }
+  catch(e) { Toast.error(e.message); }
+}
+
+document.getElementById('modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
+init();
+</script>
+</body>
+</html>

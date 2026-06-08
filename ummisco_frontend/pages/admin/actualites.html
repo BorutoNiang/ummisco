@@ -1,0 +1,203 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Actualités — UMMISCO Admin</title>
+  <link rel="stylesheet" href="../../css/global.css"/>
+  <style>
+    .toolbar { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+    .search-box { flex:1; min-width:200px; background:var(--c-surface); border:1px solid var(--c-border); border-radius:var(--radius-md); padding:9px 14px; font-size:14px; color:var(--c-text); }
+    .search-box:focus { border-color:var(--c-primary); outline:none; }
+    .tab-bar { display:flex; gap:4px; margin-bottom:24px; border-bottom:1px solid var(--c-border); }
+    .tab-btn { padding:10px 18px; font-size:14px; font-weight:500; cursor:pointer; color:var(--c-text2); border-bottom:2px solid transparent; margin-bottom:-1px; transition:all var(--transition); }
+    .tab-btn.active { color:var(--c-accent); border-bottom-color:var(--c-accent); }
+    .tab-btn:hover { color:var(--c-text); }
+    .actu-preview { background:var(--c-surface2); border-radius:var(--radius-md); padding:16px; font-size:13px; color:var(--c-text2); max-height:120px; overflow:hidden; }
+  </style>
+</head>
+<body>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('publie',this)">Publiées</button>
+  <button class="tab-btn" onclick="switchTab('en_attente',this)">En attente <span id="pending-count" style="color:var(--c-warn)"></span></button>
+  <button class="tab-btn" onclick="switchTab('all',this)">Toutes</button>
+</div>
+
+<div class="toolbar">
+  <input class="search-box" type="search" id="search" placeholder="Rechercher…" oninput="renderTable()"/>
+  <div id="add-actu-btn"></div>
+</div>
+
+<div class="card" style="padding:0">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Titre</th><th>Auteur</th><th>Statut</th><th>Publiée le</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="actu-tbody">
+        <tr><td colspan="5" style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Nouvelle actualité</span>
+      <div class="modal-close" onclick="closeModal()">✕</div>
+    </div>
+    <form id="actu-form" class="gap-form">
+      <div class="form-group">
+        <label class="form-label">Titre *</label>
+        <input class="form-input" id="f-titre" required placeholder="Titre de l'actualité"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contenu</label>
+        <textarea class="form-input" id="f-contenu" rows="6" placeholder="Contenu de l'actualité…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Image URL (optionnel)</label>
+        <input class="form-input" id="f-image" type="url" placeholder="https://…"/>
+      </div>
+      <div id="form-alert"></div>
+      <div class="flex" style="gap:10px;justify-content:flex-end">
+        <button type="button" class="btn btn--ghost" onclick="closeModal()">Annuler</button>
+        <button type="submit" class="btn btn--accent" id="form-submit">Publier</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal validation -->
+<div class="modal-overlay" id="modal-valid">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <span class="modal-title">Valider l'actualité</span>
+      <div class="modal-close" onclick="closeValid()">✕</div>
+    </div>
+    <p class="text-muted mb-md" id="valid-titre"></p>
+    <div class="actu-preview mb-md" id="valid-preview"></div>
+    <div class="flex" style="gap:10px;justify-content:flex-end">
+      <button class="btn btn--ghost" onclick="closeValid()">Annuler</button>
+      <button class="btn btn--danger" onclick="doValid('rejeter')">Rejeter</button>
+      <button class="btn btn--accent" onclick="doValid('approuver')">Approuver</button>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/admin-layout.js"></script>
+<script>
+initAdminLayout('actualites');
+
+// Bouton selon le rôle
+const _ra = Auth.getRole();
+const _addActuLabel = _ra === 'doctorant'
+  ? '+ Proposer une actualité <small style="color:#d97706">(soumis à validation)</small>'
+  : '+ Nouvelle actualité';
+document.getElementById('add-actu-btn').innerHTML = `<button class="btn btn--primary" onclick="openModal()">${_addActuLabel}</button>`;
+
+let allActus=[], currentTab='publie', editId=null, validId=null;
+
+async function loadData() {
+  const [pub, pend] = await Promise.allSettled([
+    api.get('/actualites/?limit=200'),
+    api.get('/actualites/en-attente'),
+  ]);
+  const pubData  = pub.status==='fulfilled'  ? pub.value  : [];
+  const pendData = pend.status==='fulfilled' ? pend.value : [];
+
+  allActus = currentTab === 'en_attente' ? pendData :
+             currentTab === 'all'        ? [...pubData, ...pendData] : pubData;
+
+  const cnt = pendData.length;
+  document.getElementById('pending-count').textContent = cnt > 0 ? `(${cnt})` : '';
+  renderTable();
+}
+
+function switchTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  loadData();
+}
+
+function renderTable() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = allActus.filter(a => !q || a.titre.toLowerCase().includes(q));
+  const tbody = document.getElementById('actu-tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--c-text3)">Aucune actualité</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(a => `
+    <tr>
+      <td>
+        <div style="font-weight:500;font-size:14px">${truncate(a.titre,70)}</div>
+        <div style="font-size:12px;color:var(--c-text3)">${truncate(a.contenu||'',80)}</div>
+      </td>
+      <td style="font-size:13px">${a.auteur?.prenom||''} ${a.auteur?.nom||''}</td>
+      <td>${statutBadge(a.statut)}</td>
+      <td><span class="font-mono" style="font-size:11px;color:var(--c-text3)">${formatDate(a.date_publication)}</span></td>
+      <td>
+        <div style="display:flex;gap:6px">
+          ${a.statut==='en_attente'?`<button class="btn btn--sm" style="background:rgba(6,214,160,.1);color:var(--c-accent)" onclick="openValid(${a.id})">Valider</button>`:''}
+          <button class="btn btn--ghost btn--sm" onclick="openModal(${a.id})">Modifier</button>
+          <button class="btn btn--sm btn--danger" onclick="deleteActu(${a.id})">Supprimer</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openModal(id=null) {
+  editId=id;
+  document.getElementById('modal-title').textContent = id ? 'Modifier' : 'Nouvelle actualité';
+  document.getElementById('form-alert').innerHTML='';
+  document.getElementById('actu-form').reset();
+  if (id) {
+    const a = allActus.find(x=>x.id===id);
+    if(a) {
+      document.getElementById('f-titre').value   = a.titre;
+      document.getElementById('f-contenu').value = a.contenu||'';
+      document.getElementById('f-image').value   = a.image_url||'';
+    }
+  }
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); editId=null; }
+
+document.getElementById('actu-form').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const btn=document.getElementById('form-submit'); btn.disabled=true; btn.textContent='…';
+  const payload={ titre:document.getElementById('f-titre').value, contenu:document.getElementById('f-contenu').value||null, image_url:document.getElementById('f-image').value||null };
+  try {
+    if(editId) { await api.patch(`/actualites/${editId}`,payload); Toast.success('Actualité mise à jour'); }
+    else       { await api.post('/actualites/',payload);           Toast.success('Actualité créée'); }
+    closeModal(); loadData();
+  } catch(err){ document.getElementById('form-alert').innerHTML=`<div class="alert alert--error">${err.message}</div>`; }
+  btn.disabled=false; btn.textContent='Publier';
+});
+
+function openValid(id){ validId=id; const a=allActus.find(x=>x.id===id); document.getElementById('valid-titre').textContent=a?.titre||''; document.getElementById('valid-preview').textContent=a?.contenu||''; document.getElementById('modal-valid').classList.add('open'); }
+function closeValid(){ document.getElementById('modal-valid').classList.remove('open'); validId=null; }
+async function doValid(decision){
+  if(!validId) return;
+  try{ await api.post(`/actualites/${validId}/valider`,{decision}); Toast.success(decision==='approuver'?'Approuvée':'Rejetée'); closeValid(); loadData(); }
+  catch(e){ Toast.error(e.message); }
+}
+async function deleteActu(id){
+  if(!confirm('Supprimer cette actualité ?')) return;
+  try{ await api.delete(`/actualites/${id}`); Toast.success('Supprimée'); loadData(); }
+  catch(e){ Toast.error(e.message); }
+}
+
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
+document.getElementById('modal-valid').addEventListener('click',e=>{if(e.target.id==='modal-valid')closeValid();});
+loadData();
+</script>
+</body>
+</html>

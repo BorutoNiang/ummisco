@@ -1,0 +1,199 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rôles & ACL — UMMISCO Admin</title>
+  <link rel="stylesheet" href="../../css/global.css"/>
+  <style>
+    .roles-grid { display:grid; grid-template-columns:300px 1fr; gap:24px; }
+    @media(max-width:900px){ .roles-grid { grid-template-columns:1fr; } }
+    .role-item {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 14px; border-radius:var(--radius-md); cursor:pointer;
+      border:1px solid transparent; transition:all var(--transition);
+      margin-bottom:6px;
+    }
+    .role-item:hover { background:var(--c-surface2); border-color:var(--c-border); }
+    .role-item.selected { background:rgba(59,130,246,.1); border-color:rgba(59,130,246,.3); }
+    .role-name { font-weight:500; font-size:14px; }
+    .role-count { font-family:var(--font-mono); font-size:11px; color:var(--c-text3); }
+    .perm-section { margin-bottom:20px; }
+    .perm-section-title {
+      font-family:var(--font-mono); font-size:11px; letter-spacing:.08em;
+      text-transform:uppercase; color:var(--c-text3);
+      padding:8px 0 8px; border-bottom:1px solid var(--c-border); margin-bottom:12px;
+    }
+    .perm-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; }
+    .perm-label { font-size:14px; color:var(--c-text2); }
+    .perm-checks { display:flex; gap:16px; }
+    .perm-check { display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .perm-check label { font-family:var(--font-mono); font-size:10px; color:var(--c-text3); }
+    .perm-check input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color:var(--c-accent); }
+    .save-bar {
+      position:sticky; bottom:0; background:var(--c-surface);
+      border-top:1px solid var(--c-border);
+      padding:16px; margin:-32px -28px 0;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+  </style>
+</head>
+<body>
+
+<div class="roles-grid">
+  <!-- Colonne rôles -->
+  <div>
+    <div class="flex-between mb-md">
+      <h3>Rôles</h3>
+      <button class="btn btn--accent btn--sm" onclick="openNewRole()">+ Nouveau</button>
+    </div>
+    <div id="roles-list">
+      <div class="skeleton" style="height:44px;margin-bottom:8px"></div>
+      <div class="skeleton" style="height:44px;margin-bottom:8px"></div>
+      <div class="skeleton" style="height:44px"></div>
+    </div>
+  </div>
+
+  <!-- Colonne permissions -->
+  <div class="card">
+    <div id="perm-header" class="flex-between mb-md">
+      <h3 id="perm-role-name" style="color:var(--c-text3)">Sélectionner un rôle</h3>
+    </div>
+    <div id="perm-content">
+      <p class="text-muted" style="text-align:center;padding:48px 0">← Sélectionnez un rôle pour gérer ses permissions</p>
+    </div>
+    <div class="save-bar" id="save-bar" style="display:none">
+      <span class="text-muted" style="font-size:13px">Les modifications ne sont pas encore sauvegardées</span>
+      <button class="btn btn--accent" onclick="savePermissions()">💾 Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal nouveau rôle -->
+<div class="modal-overlay" id="modal-role">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <span class="modal-title">Nouveau rôle</span>
+      <div class="modal-close" onclick="closeRoleModal()">✕</div>
+    </div>
+    <div class="gap-form">
+      <div class="form-group">
+        <label class="form-label">Libellé *</label>
+        <input class="form-input" id="r-libelle" placeholder="nom_du_role (sans espaces)"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-input" id="r-desc" rows="2" placeholder="Description du rôle…"></textarea>
+      </div>
+      <div id="role-alert"></div>
+      <div class="flex" style="gap:10px;justify-content:flex-end">
+        <button class="btn btn--ghost" onclick="closeRoleModal()">Annuler</button>
+        <button class="btn btn--accent" onclick="createRole()">Créer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/admin-layout.js"></script>
+<script>
+initAdminLayout('roles');
+requireAuth(['super_admin']);
+
+const ENTITES = ['publication','dataset','actualite','projet','utilisateur','delivrable','partenaire','bailleur','evenement','integration_externe'];
+const ACTIONS = ['create','read','update','delete'];
+const ACTION_LABELS = { create:'Créer', read:'Lire', update:'Modifier', delete:'Supprimer' };
+
+let roles=[], perms=[], selectedRoleId=null;
+
+async function init() {
+  [roles, perms] = await Promise.all([
+    api.get('/admin/roles').catch(()=>[]),
+    api.get('/admin/permissions').catch(()=>[]),
+  ]);
+  renderRoles();
+}
+
+function renderRoles() {
+  const list = document.getElementById('roles-list');
+  list.innerHTML = roles.map(r => `
+    <div class="role-item ${r.id===selectedRoleId?'selected':''}" onclick="selectRole(${r.id})">
+      <div>
+        <div class="role-name">${r.libelle}</div>
+        <div class="role-count">${r.permissions?.length||0} permissions</div>
+      </div>
+      ${r.libelle!=='super_admin'?`<button class="btn btn--sm btn--danger" onclick="event.stopPropagation();deleteRole(${r.id})">Supprimer</button>`:''}
+    </div>
+  `).join('');
+}
+
+async function selectRole(id) {
+  selectedRoleId = id;
+  renderRoles();
+  const role = roles.find(r=>r.id===id);
+  document.getElementById('perm-role-name').textContent = role?.libelle || '';
+
+  const rolePerms = await api.get(`/admin/roles/${id}/permissions`).catch(()=>[]);
+  const permSet = new Set(rolePerms.map(p=>`${p.action}:${p.entite}`));
+
+  const content = document.getElementById('perm-content');
+  content.innerHTML = ENTITES.map(entite => `
+    <div class="perm-section">
+      <div class="perm-section-title">${entite.replace('_',' ')}</div>
+      <div class="perm-row">
+        <span class="perm-label" style="text-transform:capitalize">${entite.replace('_',' ')}</span>
+        <div class="perm-checks">
+          ${ACTIONS.map(action => {
+            const p = perms.find(x=>x.action===action&&x.entite===entite);
+            if (!p) return '';
+            return `
+              <div class="perm-check">
+                <input type="checkbox" id="perm-${p.id}" data-perm-id="${p.id}"
+                  ${permSet.has(`${action}:${entite}`) ? 'checked' : ''}/>
+                <label for="perm-${p.id}">${ACTION_LABELS[action]}</label>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('save-bar').style.display = '';
+}
+
+async function savePermissions() {
+  if (!selectedRoleId) return;
+  const checked = Array.from(document.querySelectorAll('[data-perm-id]:checked'))
+    .map(el => +el.dataset.permId);
+  try {
+    await api.put(`/admin/roles/${selectedRoleId}/permissions`, { permission_ids: checked });
+    Toast.success('Permissions sauvegardées');
+    roles = await api.get('/admin/roles').catch(()=>roles);
+    renderRoles();
+  } catch(e) { Toast.error(e.message); }
+}
+
+function openNewRole(){ document.getElementById('role-alert').innerHTML=''; document.getElementById('r-libelle').value=''; document.getElementById('r-desc').value=''; document.getElementById('modal-role').classList.add('open'); }
+function closeRoleModal(){ document.getElementById('modal-role').classList.remove('open'); }
+
+async function createRole(){
+  const libelle=document.getElementById('r-libelle').value.trim();
+  if(!libelle){ Toast.error('Libellé requis'); return; }
+  try{
+    const r = await api.post('/admin/roles',{ libelle, description:document.getElementById('r-desc').value||null });
+    roles.push(r); renderRoles(); closeRoleModal(); Toast.success('Rôle créé');
+  } catch(e){ document.getElementById('role-alert').innerHTML=`<div class="alert alert--error">${e.message}</div>`; }
+}
+
+async function deleteRole(id){
+  if(!confirm('Supprimer ce rôle ?')) return;
+  try{ await api.delete(`/admin/roles/${id}`); roles=roles.filter(r=>r.id!==id); renderRoles(); Toast.success('Rôle supprimé'); }
+  catch(e){ Toast.error(e.message); }
+}
+
+document.getElementById('modal-role').addEventListener('click',e=>{if(e.target.id==='modal-role')closeRoleModal();});
+init();
+</script>
+</body>
+</html>

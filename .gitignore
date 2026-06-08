@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Environnement virtuel
+venv/
+.venv/
+env/
+
+# Variables d'environnement (SECRETS — ne jamais commiter)
+.env
+*.env
+
+# Uploads utilisateurs
+ummisco_backend/uploads/
+
+# Alembic versions (garder alembic.ini mais pas les versions auto-générées)
+# alembic/versions/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node (si utilisé plus tard)
+node_modules/
+
+# Scripts temporaires
+ummisco_backend/add_*.py

@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Datasets — UMMISCO</title>
+  <link rel="stylesheet" href="../css/global.css"/>
+  <style>
+    .filters-bar { display:flex;gap:12px;flex-wrap:wrap;padding:20px 0;border-bottom:1px solid var(--c-border);margin-bottom:28px; }
+    .search-box  { flex:1;min-width:220px;background:#fff;border:1px solid var(--c-border);border-radius:var(--radius-sm);padding:9px 14px;font-size:14px;color:var(--c-text); }
+    .search-box:focus { border-color:var(--c-primary);outline:none; }
+    .filter-pill { padding:6px 14px;border-radius:100px;border:1px solid var(--c-border);font-size:13px;cursor:pointer;transition:all var(--transition);color:var(--c-text2);background:#fff; }
+    .filter-pill:hover  { border-color:var(--c-primary);color:var(--c-primary); }
+    .filter-pill.active { background:var(--c-primary);color:#fff;border-color:var(--c-primary); }
+    .ds-card { background:#fff;border:1px solid var(--c-border);border-radius:var(--radius-md);padding:20px;transition:box-shadow var(--transition),transform var(--transition);cursor:pointer;border-top:3px solid var(--c-primary); }
+    .ds-card:hover { box-shadow:var(--shadow-md);transform:translateY(-2px); }
+    .ds-icon-wrap { width:44px;height:44px;border-radius:var(--radius-sm);background:var(--c-primary-l);display:flex;align-items:center;justify-content:center;margin-bottom:12px; }
+    .ds-title { font-weight:700;font-size:.9rem;color:var(--c-primary);margin-bottom:6px;line-height:1.3; }
+    .ds-desc { font-size:12px;color:var(--c-text2);line-height:1.5;margin-bottom:12px; }
+    .ds-meta { display:flex;gap:6px;flex-wrap:wrap; }
+    .ds-tag { font-size:11px;padding:2px 8px;border-radius:3px;background:var(--c-surface);color:var(--c-text3);border:1px solid var(--c-border); }
+    .ds-footer { display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--c-border);font-size:12px; }
+    .ds-size { font-family:var(--font-mono);color:var(--c-text3); }
+  </style>
+</head>
+<body>
+<div class="page-header-inst">
+  <div class="container">
+    <h1>Datasets</h1>
+    <p>Données de recherche produites par les chercheurs UMMISCO — librement accessibles ou sur demande</p>
+  </div>
+</div>
+
+<div style="padding:40px 0 64px">
+  <div class="container">
+    <div class="filters-bar">
+      <input class="search-box" type="search" id="search" placeholder="Rechercher par titre ou mots-clés…" oninput="filterData()"/>
+      <button class="filter-pill active" onclick="setVis(null,this)">Tous</button>
+      <button class="filter-pill" onclick="setVis('public',this)">Public</button>
+      <button class="filter-pill" onclick="setVis('protege',this)">Protégé</button>
+    </div>
+    <div style="font-size:13px;color:var(--c-text3);margin-bottom:18px" id="count-lbl"></div>
+    <div class="grid-3" id="ds-grid">
+      <div class="skeleton" style="height:170px"></div>
+      <div class="skeleton" style="height:170px"></div>
+      <div class="skeleton" style="height:170px"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+initNav({ active:'recherches', base:'../' }); initFooter({ base:'../' });
+
+const FMT_ICONS = {
+  CSV:   '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/>',
+  JSON:  '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+  PDF:   '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/>',
+  SHP:   '<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>',
+  NetCDF:'<path d="M12 2a10 10 0 0 1 0 20M12 2a10 10 0 0 0 0 20M2 12h20"/>',
+  XLSX:  '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="8 13 10 15 8 17"/><polyline points="16 13 14 15 16 17"/>',
+};
+function formatSize(b) { if(!b)return '—'; if(b<1048576)return (b/1024).toFixed(0)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
+
+const DEMO = [
+  { id:1, titre:'Données épidémio Sénégal 2020-2024', description:'Données de surveillance des maladies infectieuses au Sénégal.', visibilite:'public', format:'CSV', taille_octets:2400000, mots_cles:'épidémio, sénégal', axe:{nom:'Épidémiologie'}, licence:'CC BY 4.0' },
+  { id:2, titre:'Modèles IoT capteurs végétaux', description:'Séries temporelles issues des capteurs de sève sur arbres du campus.', visibilite:'public', format:'JSON', taille_octets:870000, mots_cles:'iot, capteurs', axe:{nom:'IoT'}, licence:'CC0' },
+  { id:3, titre:'Prédiction carbone sols Sénégal', description:'Dataset de prédiction spatiale de la teneur en carbone organique.', visibilite:'protege', format:'NetCDF', taille_octets:15000000, mots_cles:'carbone, sols', axe:{nom:'Environnement'}, licence:'CC BY-SA 4.0' },
+  { id:4, titre:'Carte géologique Dakar', description:'Données cartographiques géologiques de la région de Dakar.', visibilite:'public', format:'SHP', taille_octets:44000000, mots_cles:'géologie, dakar', axe:{nom:'Géologie'}, licence:'CC BY 4.0' },
+  { id:5, titre:'Simulations épidémio EVELOP', description:'Sorties des simulations multi-agents du catalogue Evelop.', visibilite:'protege', format:'JSON', taille_octets:9100000, mots_cles:'simulation, épidémio', axe:{nom:'Épidémiologie'}, licence:'CC BY-SA 4.0' },
+  { id:6, titre:'Données cardiaques végétales brutes', description:'Mesures de sève et signaux cardiaques pour la modélisation végétale.', visibilite:'protege', format:'CSV', taille_octets:3200000, mots_cles:'cardiologie, arbres', axe:{nom:'Cardiologie'}, licence:'Propriétaire' },
+];
+
+let allDs = [], activeVis = null;
+
+function setVis(v, btn) {
+  activeVis = v;
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterData();
+}
+function filterData() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = allDs.filter(d => (!activeVis || d.visibilite === activeVis) && (!q || d.titre.toLowerCase().includes(q) || (d.mots_cles||'').toLowerCase().includes(q)));
+  document.getElementById('count-lbl').textContent = `${filtered.length} dataset${filtered.length !== 1 ? 's' : ''} trouvé${filtered.length !== 1 ? 's' : ''}`;
+  render(filtered);
+}
+function render(list) {
+  const user = Auth.getUser();
+  const grid = document.getElementById('ds-grid');
+  if (!list.length) { grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:48px;color:var(--c-text3)">Aucun dataset trouvé.</p>'; return; }
+  grid.innerHTML = list.map(d => {
+    const locked = d.visibilite === 'prive' && (!user || d.proprietaire?.id !== user.id);
+    const iconSvg = FMT_ICONS[d.format] || FMT_ICONS.CSV;
+    const borderColor = d.visibilite === 'public' ? '#059669' : d.visibilite === 'protege' ? '#2563eb' : '#d97706';
+    return `<div class="ds-card" style="border-top-color:${borderColor}" onclick="${locked ? "Toast.info('Connectez-vous pour accéder à ce dataset')" : 'void(0)'}">
+      <div class="ds-icon-wrap" style="background:${borderColor}18">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${borderColor}" stroke-width="1.8">${iconSvg}</svg>
+      </div>
+      <div class="ds-title">${d.titre}</div>
+      <div class="ds-desc">${truncate(d.description||'', 100)}</div>
+      <div class="ds-meta">
+        ${d.axe ? `<span class="ds-tag">${d.axe.nom}</span>` : ''}
+        ${d.format ? `<span class="ds-tag">${d.format}</span>` : ''}
+        ${d.licence ? `<span class="ds-tag">${d.licence}</span>` : ''}
+      </div>
+      <div class="ds-footer">
+        <div style="display:flex;align-items:center;gap:6px">${badgeHtml(d.visibilite)} <span class="ds-size">${formatSize(d.taille_octets)}</span></div>
+        ${!locked && d.fichier_path
+          ? `<a class="btn btn--primary btn--sm" href="/uploads/${d.fichier_path}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:5px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Télécharger
+            </a>`
+          : `<span style="font-size:12px;color:var(--c-text3)">${locked ? 'Accès restreint' : 'Disponible'}</span>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function init() {
+  try { allDs = await api.get('/datasets/?limit=100'); } catch { allDs = DEMO; }
+  filterData();
+}
+init();
+</script>
+<script src="../js/i18n.js"></script>
+</body>
+</html>

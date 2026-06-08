@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UMMISCO — Portail de Recherche · ESP/UCAD</title>
+  <link rel="stylesheet" href="css/global.css"/>
+  <style>
+    .home-section { padding: 52px 0; }
+    .home-section--gray { background: var(--c-surface); }
+    .home-layout { display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
+    @media(max-width:900px) { .home-layout { grid-template-columns: 1fr; } }
+
+    .pub-list-item { display:flex; gap:14px; padding:13px 0; border-bottom:1px solid var(--c-border); }
+    .pub-list-item:last-child { border-bottom:none; }
+    .pub-list-num { width:26px;height:26px;border-radius:50%;background:var(--c-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px; }
+    .pub-list-title { font-size:14px;font-weight:600;color:var(--c-primary);margin-bottom:3px;cursor:pointer; }
+    .pub-list-title:hover { text-decoration:underline; }
+    .pub-list-meta { font-size:12px;color:var(--c-text3); }
+
+    .widget { background:#fff;border:1px solid var(--c-border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:20px; }
+    .widget-header { background:var(--c-primary);color:#fff;padding:10px 14px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px; }
+    .widget-body { padding:12px 14px; }
+    .widget-link-item { display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--c-border);font-size:13px;color:var(--c-text2);transition:color var(--transition);cursor:pointer; }
+    .widget-link-item:last-child { border-bottom:none; }
+    .widget-link-item:hover { color:var(--c-primary); }
+    .widget-link-item svg { color:var(--c-accent);flex-shrink:0; }
+    .widget-event-item { padding:8px 0;border-bottom:1px solid var(--c-border);font-size:13px; }
+    .widget-event-item:last-child { border-bottom:none; }
+    .widget-event-date { font-size:11px;font-weight:700;color:var(--c-accent);text-transform:uppercase;margin-bottom:2px; }
+    .widget-event-title { color:var(--c-text);font-weight:500; }
+
+    .partners-strip { display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:center; }
+    .partner-logo-box { padding:10px 18px;border:1px solid var(--c-border);border-radius:var(--radius-sm);background:#fff;font-size:13px;font-weight:600;color:var(--c-text2);transition:all var(--transition); }
+    .partner-logo-box:hover { border-color:var(--c-primary);color:var(--c-primary); }
+
+    .axes-grid { display:grid;grid-template-columns:repeat(5,1fr);gap:16px; }
+    @media(max-width:1024px) { .axes-grid { grid-template-columns:repeat(3,1fr); } }
+    @media(max-width:640px)  { .axes-grid { grid-template-columns:repeat(2,1fr); } }
+
+    .img-placeholder { background:linear-gradient(135deg,var(--c-primary) 0%,#0055bb 100%);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3); }
+    .slide-icon { opacity:.25; }
+  </style>
+</head>
+<body>
+
+<!-- Nav injecté par nav.js -->
+
+<!-- ══ HERO SLIDER ══ -->
+<div class="hero-slider" id="hero-slider">
+  <div class="hero-slide active">
+    <img src="images/hero-accueil.png" alt="UMMISCO" style="width:100%;height:100%;object-fit:cover;object-position:center center"/>
+    <div class="hero-slide-overlay"></div>
+    <div class="hero-caption"><div class="container"><div class="hero-caption-inner">
+      <h2>Modélisation des Systèmes Complexes</h2>
+      <p>L'UMMISCO regroupe des chercheurs spécialisés dans la modélisation mathématique et informatique appliquée aux enjeux de santé, environnement et technologies.</p>
+      <a href="pages/axes.html" class="btn-hero">Découvrir nos recherches</a>
+    </div></div></div>
+  </div>
+  <div class="hero-slide">
+    <img src="images/hero-accueil.png" alt="UMMISCO" style="width:100%;height:100%;object-fit:cover;object-position:center center"/>
+    <div class="hero-slide-overlay"></div>
+    <div class="hero-caption"><div class="container"><div class="hero-caption-inner">
+      <h2>Science pour le Développement</h2>
+      <p>Nos travaux contribuent aux défis du développement durable en Afrique de l'Ouest, de l'épidémiologie à la géologie des sols.</p>
+      <a href="pages/publications.html" class="btn-hero">Voir nos publications</a>
+    </div></div></div>
+  </div>
+  <div class="hero-slide">
+    <img src="images/hero-accueil.png" alt="UMMISCO" style="width:100%;height:100%;object-fit:cover;object-position:center center"/>
+    <div class="hero-slide-overlay"></div>
+    <div class="hero-caption"><div class="container"><div class="hero-caption-inner">
+      <h2>IoT &amp; Science Citoyenne</h2>
+      <p>Des capteurs connectés aux simulations multi-agents — l'UMMISCO développe des outils numériques innovants pour la recherche participative.</p>
+      <a href="pages/datasets.html" class="btn-hero">Explorer les datasets</a>
+    </div></div></div>
+  </div>
+  <button class="hero-prev" onclick="slideChange(-1)">&#8249;</button>
+  <button class="hero-next" onclick="slideChange(1)">&#8250;</button>
+  <div class="hero-dots" id="hero-dots"></div>
+</div>
+
+<!-- ══ CONTENU PRINCIPAL ══ -->
+<div class="home-section">
+  <div class="container">
+
+    <!-- ── Actualités — pleine largeur ── -->
+    <div class="actu-home-title" data-i18n="home.actus.title">Actualités</div>
+    <div class="actu-home-sep"></div>
+    <div class="grid-3" id="actus-grid" style="margin-bottom:8px">
+      <div class="skeleton" style="height:340px"></div>
+      <div class="skeleton" style="height:340px"></div>
+      <div class="skeleton" style="height:340px"></div>
+    </div>
+    <div class="voir-plus-wrap">
+      <a href="pages/actualites.html" class="btn-voir-plus" data-i18n="home.actus.more">voir plus &gt;&gt;</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RUBRIQUES THEMATIQUES ══ -->
+<div class="home-section home-section--gray">
+  <div class="container">
+    <div class="rubriques-grid" id="rubriques-grid">
+
+      <div class="rubrique-card">
+        <div class="rubrique-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </div>
+        <div class="rubrique-body">
+          <div class="rubrique-title">Enjeux</div>
+          <div class="rubrique-text">Les enjeux de la modélisation à base d'agents. Les travaux en modélisation informatique au sein de l'UMMISCO se concentrent sur la famille de méthodes de modélisation connues sous le terme de « modélisation à base d'agents ». L'usage de ces méthodes se développe depuis une vingtaine d'années dans un nombre croissant de disciplines...</div>
+          <span class="rubrique-more" onclick="openRubrique('enjeux')">Lire la suite &gt;&gt;</span>
+        </div>
+      </div>
+
+      <div class="rubrique-card">
+        <div class="rubrique-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <div class="rubrique-body">
+          <div class="rubrique-title">Axes scientifiques</div>
+          <div class="rubrique-text">Les travaux des chercheurs de ce thème se répartiront sur quatre thèmes de recherche : Données et connaissances, Langages et méthodes, Exploration, Plate-forme. Il s'agit de proposer des moyens pour caractériser et éliciter des connaissances à partir d'un grand volume de données réelles...</div>
+          <span class="rubrique-more" onclick="openRubrique('axes')">Lire la suite &gt;&gt;</span>
+        </div>
+      </div>
+
+      <div class="rubrique-card">
+        <div class="rubrique-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.19 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 3.18 2 2 0 0 1 4.11 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.29 6.29l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <div class="rubrique-body">
+          <div class="rubrique-title">Projets</div>
+          <div class="rubrique-text">Génération de populations synthétiques spatialisées et socialement structurées pour la simulation sociale. The Gen project aims at combining applied mathematics and computer science approaches in order to incorporate arbitrary data and to generate statistically valid populations of artificial agents...</div>
+          <span class="rubrique-more" onclick="openRubrique('projets')">Lire la suite &gt;&gt;</span>
+        </div>
+      </div>
+
+      <div class="rubrique-card">
+        <div class="rubrique-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="2" y1="18" x2="4" y2="18"/><line x1="20" y1="18" x2="22" y2="18"/><line x1="19.78" y1="10.22" x2="18.36" y2="11.64"/></svg>
+        </div>
+        <div class="rubrique-body">
+          <div class="rubrique-title">Milieux et ressources vivantes</div>
+          <div class="rubrique-text">Activités de recherche. Dans un contexte international (IPBES), national (FRB) et régional (LabEx CeMEB) favorable aux études portant sur la biodiversité, l'UMI UMMISCO souhaite capitaliser les travaux menés par ses membres sur cette thématique. Les modèles développés reposent sur une approche mécaniste et concernent des ressources vivantes...</div>
+          <span class="rubrique-more" onclick="openRubrique('milieux')">Lire la suite &gt;&gt;</span>
+        </div>
+      </div>
+
+      <div class="rubrique-card">
+        <div class="rubrique-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="rubrique-body">
+          <div class="rubrique-title">Epidémiologie et santé</div>
+          <div class="rubrique-text">Activités de recherche. Les sciences de la santé ont toujours été un champ extrêmement prisé par les théoriciens, principalement parce que ces approches théoriques permettent d'apporter des éléments de réponses dans des situations où la mise en place d'expérimentations se révèle très compliquée...</div>
+          <span class="rubrique-more" onclick="openRubrique('epidemio')">Lire la suite &gt;&gt;</span>
+        </div>
+      </div>
+
+      <div class="rubrique-card">
+        <div class="rubrique-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="rubrique-body">
+          <div class="rubrique-title">Méthodes mathématiques pour la dynamique des populations</div>
+          <div class="rubrique-text">Activités de recherche. Les champs des mathématiques couverts au sein de l'unité sont les systèmes dynamiques (équations différentielles, équations aux différences finies, équations à retard), les modèles stochastiques, la théorie des jeux, la théorie du contrôle, les méthodes d'agrégation de variables...</div>
+          <span class="rubrique-more" onclick="openRubrique('maths')">Lire la suite &gt;&gt;</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal rubriques -->
+<div class="modal-overlay" id="modal-rubrique">
+  <div class="modal" style="max-width:760px">
+    <div class="modal-header">
+      <span class="modal-title" id="rubrique-title"></span>
+      <div class="modal-close" onclick="closeRubrique()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div id="rubrique-body" style="font-size:14px;color:var(--c-text2);line-height:1.8"></div>
+  </div>
+</div>
+
+<!-- ══ ÉVÉNEMENTS ══ -->
+<div class="home-section">
+  <div class="container">
+    <div class="actu-home-title" data-i18n="home.events.title">Evénements</div>
+    <div class="actu-home-sep"></div>
+    <div class="grid-3" id="events-home-grid" style="margin-bottom:8px">
+      <div class="skeleton" style="height:320px"></div>
+      <div class="skeleton" style="height:320px"></div>
+      <div class="skeleton" style="height:320px"></div>
+    </div>
+    <div class="voir-plus-wrap">
+      <a href="pages/actualites.html" class="btn-voir-plus" data-i18n="home.events.more">voir plus d'évènements &gt;&gt;</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CONTENU PUBLICATIONS + SIDEBAR ══ -->
+<div class="home-section">
+  <div class="container">
+    <div class="home-layout">
+      <!-- Colonne principale -->
+      <div>
+        <div class="section-title">
+          <div class="section-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+          <h2>Publications récentes</h2>
+          <div class="section-title-bar"></div>
+          <a href="pages/publications.html" class="btn btn--ghost btn--sm">Toutes les publications</a>
+        </div>
+        <div class="card" style="padding:0">
+          <div id="pubs-list" style="padding:4px 18px">
+            <div class="skeleton" style="height:52px;margin:12px 0"></div>
+            <div class="skeleton" style="height:52px;margin:12px 0"></div>
+            <div class="skeleton" style="height:52px;margin:12px 0"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <div class="widget">
+          <div class="widget-header">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="5" r="3"/><path d="M12 22V8M5 12H2a10 10 0 0 0 20 0h-3"/></svg>
+            Axes thématiques
+          </div>
+          <div class="widget-body" id="axes-sidebar">
+            <div class="skeleton" style="height:28px;margin-bottom:8px"></div>
+            <div class="skeleton" style="height:28px;margin-bottom:8px"></div>
+            <div class="skeleton" style="height:28px"></div>
+          </div>
+        </div>
+
+        <div class="widget">
+          <div class="widget-header">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Événements à venir
+          </div>
+          <div class="widget-body" id="events-sidebar">
+            <div class="skeleton" style="height:44px;margin-bottom:8px"></div>
+            <div class="skeleton" style="height:44px"></div>
+          </div>
+        </div>
+
+        <div class="widget">
+          <div class="widget-header">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Liens utiles
+          </div>
+          <div class="widget-body">
+            <a class="widget-link-item" href="https://ummisco.ird.fr" target="_blank">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              UMMISCO Global (IRD)
+            </a>
+            <a class="widget-link-item" href="https://ucad.sn" target="_blank">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              Université UCAD
+            </a>
+            <a class="widget-link-item" href="https://esp.ucad.sn" target="_blank">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              École Polytechnique (ESP)
+            </a>
+            <a class="widget-link-item" href="pages/datasets.html">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              Données ouvertes
+            </a>
+            <a class="widget-link-item" href="pages/login.html">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              Espace membres
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Axes -->
+    <div class="section-title" style="margin-top:36px">
+      <div class="section-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+      <h2>Axes de recherche</h2>
+      <div class="section-title-bar"></div>
+      <a href="pages/axes.html" class="btn btn--ghost btn--sm">Explorer</a>
+    </div>
+    <div class="axes-grid" id="axes-main">
+      <div class="skeleton" style="height:130px"></div>
+      <div class="skeleton" style="height:130px"></div>
+      <div class="skeleton" style="height:130px"></div>
+      <div class="skeleton" style="height:130px"></div>
+      <div class="skeleton" style="height:130px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ UMMISCO EN CHIFFRES ══ -->
+<div class="chiffres-section">
+  <div class="container">
+    <h2 class="chiffres-title" data-i18n="chiffres.title">UMMISCO en chiffres</h2>
+    <div class="chiffres-grid">
+      <div class="chiffre-item">
+        <div class="chiffre-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        </div>
+        <div class="chiffre-num" data-target="45">0</div>
+        <div class="chiffre-lbl" data-i18n="chiffres.doctorants">Doctorants</div>
+      </div>
+      <div class="chiffre-item">
+        <div class="chiffre-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/><path d="M2 20h4M18 20h4"/><circle cx="4" cy="14" r="2"/><circle cx="20" cy="14" r="2"/></svg>
+        </div>
+        <div class="chiffre-num" data-target="12">0</div>
+        <div class="chiffre-lbl" data-i18n="chiffres.international">Internationaux</div>
+      </div>
+      <div class="chiffre-item">
+        <div class="chiffre-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+        </div>
+        <div class="chiffre-num" data-target="8">0</div>
+        <div class="chiffre-lbl" data-i18n="chiffres.nationalites">Nationalités</div>
+      </div>
+      <div class="chiffre-item">
+        <div class="chiffre-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><path d="M12 12v.01"/></svg>
+        </div>
+        <div class="chiffre-num" data-target="20">0</div>
+        <div class="chiffre-lbl" data-i18n="chiffres.cotutelle">En Cotutelle</div>
+      </div>
+      <div class="chiffre-item">
+        <div class="chiffre-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <div class="chiffre-num" data-target="5">0</div>
+        <div class="chiffre-lbl" data-i18n="chiffres.partenariat">Partenariat</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PARTENAIRES ══ -->
+<div class="home-section home-section--gray">
+  <div class="container">
+    <div class="section-title">
+      <div class="section-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <h2>Nos partenaires</h2>
+      <div class="section-title-bar"></div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:center;justify-content:center;padding:16px 0">
+      <a href="https://ummisco.ird.fr" target="_blank" class="partner-logo-item" title="UMMISCO">
+        <img src="images/logo-ummisco.png" alt="UMMISCO"/>
+      </a>
+      <a href="https://esp.ucad.sn" target="_blank" class="partner-logo-item" title="ESP Dakar">
+        <img src="images/esp.jpg" alt="ESP Dakar"/>
+      </a>
+      <a href="https://ucad.sn" target="_blank" class="partner-logo-item" title="UCAD">
+        <img src="images/logo-ucad.png" alt="UCAD"/>
+      </a>
+      <a href="https://ird.fr" target="_blank" class="partner-logo-item" title="IRD">
+        <img src="images/ird.png" alt="IRD"/>
+      </a>
+      <a href="https://ugb.edu.sn" target="_blank" class="partner-logo-item" title="UGB">
+        <img src="images/ugb.jpg" alt="Université Gaston Berger"/>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Footer injecté par nav.js -->
+
+<script src="js/api.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/i18n.js"></script>
+<script>
+initNav({ active: 'accueil', base: '' });
+initFooter({ base: '' });
+
+/* ── Hero slider ─────────────────────────────────────────── */
+const slides = document.querySelectorAll('.hero-slide');
+const dotsEl  = document.getElementById('hero-dots');
+let cur = 0, timer;
+
+slides.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'hero-dot' + (i === 0 ? ' active' : '');
+  d.onclick = () => goTo(i);
+  dotsEl.appendChild(d);
+});
+
+function goTo(n) {
+  slides[cur].classList.remove('active'); dotsEl.children[cur].classList.remove('active');
+  cur = (n + slides.length) % slides.length;
+  slides[cur].classList.add('active'); dotsEl.children[cur].classList.add('active');
+  clearInterval(timer); timer = setInterval(() => goTo(cur + 1), 8000);
+}
+function slideChange(d) { goTo(cur + d); }
+
+// Pause au survol
+const slider = document.getElementById('hero-slider');
+slider.addEventListener('mouseenter', () => clearInterval(timer));
+slider.addEventListener('mouseleave', () => { timer = setInterval(() => goTo(cur + 1), 8000); });
+
+timer = setInterval(() => goTo(cur + 1), 8000);
+
+/* ── Axes ── */
+const AXES_CFG = [
+  { svg:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>', color:'#dc2626', nom:'Épidémiologie' },
+  { svg:'<path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/>', color:'#059669', nom:'IoT & Science citoyenne' },
+  { svg:'<path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="2" y1="18" x2="4" y2="18"/><line x1="20" y1="18" x2="22" y2="18"/><line x1="19.78" y1="10.22" x2="18.36" y2="11.64"/><line x1="23" y1="22" x2="1" y2="22"/><polyline points="8 6 12 2 16 6"/>', color:'#2563eb', nom:'Environnement' },
+  { svg:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>', color:'#d97706', nom:'Cardiologie' },
+  { svg:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>', color:'#7c3aed', nom:'Géologie' },
+];
+async function loadAxes() {
+  let axes = [];
+  try { axes = await api.get('/axes/'); } catch { axes = AXES_CFG.map((c,i) => ({id:i+1, nom:c.nom, description:''})); }
+  document.getElementById('axes-sidebar').innerHTML = axes.map(a => {
+    const cfg = AXES_CFG.find(c => c.nom === a.nom) || AXES_CFG[0];
+    return `<a class="widget-link-item" href="pages/axes.html" style="border-left:3px solid ${cfg.color};padding-left:8px">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${cfg.color}" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      ${a.nom}
+    </a>`;
+  }).join('');
+  document.getElementById('axes-main').innerHTML = axes.map(a => {
+    const cfg = AXES_CFG.find(c => c.nom === a.nom) || AXES_CFG[0];
+    return `<a class="axe-card-inst" style="--axe-color:${cfg.color}" href="pages/axes.html">
+      <div class="axe-card-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="${cfg.color}" stroke-width="1.8">${cfg.svg}</svg>
+      </div>
+      <div class="axe-card-name">${a.nom}</div>
+      <div class="axe-card-desc">${(a.description||'').slice(0,80) || 'Cliquez pour en savoir plus.'}</div>
+    </a>`;
+  }).join('');
+}
+
+/* ── Publications ── */
+async function loadPubs() {
+  let pubs = [];
+  try { pubs = await api.get('/publications/?limit=5'); } catch {}
+  const el = document.getElementById('pubs-list');
+  if (!pubs.length) { el.innerHTML = '<p style="padding:18px;color:var(--c-text3);font-size:13px;text-align:center">Aucune publication disponible pour le moment.</p>'; return; }
+  el.innerHTML = pubs.map((p,i) => `
+    <div class="pub-list-item">
+      <div class="pub-list-num">${i+1}</div>
+      <div>
+        <div class="pub-list-title" onclick="location.href='pages/publications.html'">${p.titre}</div>
+        <div class="pub-list-meta">${p.auteur?.prenom||''} ${p.auteur?.nom||''}${p.revue?' · '+p.revue:''}${p.annee?' · '+p.annee:''}${p.axe?' · '+p.axe.nom:''}</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('s-pubs').textContent = pubs.length + '+';
+}
+
+/* ── Actualités ── */
+const DEMO_NEWS = [
+  {
+    id:1,
+    titre:'MISS – ABMS 2019',
+    date_publication:'2022-06-23T09:35:00',
+    image_url:'images/actu-miss-abms.jpg',
+    contenu:"Multi-platform International Summer School on Agent-Based Modelling & Simulation for Renewable Resources Management. This 2-week summer school is about learning the different skills required for building agent-based models for renewable resources management."
+  },
+  {
+    id:2,
+    titre:'Appel 2019 à candidature du PDI',
+    date_publication:'2022-01-14T12:40:00',
+    image_url:'images/actu-appel-pdi.jpg',
+    contenu:"L'appel 2019 pour le PROGRAMME DOCTORAL INTERNATIONAL (PDI) : « Modélisation des Systèmes Complexes » (MSC) est lancé. Ce programme permettra de financer 1 à 2 contrats doctoraux au Nord et 9 à 12 contrats doctoraux au Sud."
+  },
+  {
+    id:3,
+    titre:"Atelier sur la mobilité des pêcheurs",
+    date_publication:'2021-06-29T13:44:00',
+    image_url:'images/actu-ateliers-pecheurs.jpg',
+    contenu:"Timothée Brochier anime la semaine du 20 mai 2019 un atelier sur la mobilité des pêcheurs dans le cadre de la recherche sur la dynamique des pêcheries. Cet atelier prendra place dans la salle multimédia du CRENT, sur le campus de l'ESP."
+  },
+];
+async function loadActus() {
+  let actus = [];
+  try { actus = await api.get('/actualites/?limit=3'); } catch {}
+  if (!actus.length) actus = DEMO_NEWS;
+  const BG_COLORS = [
+    'linear-gradient(135deg,#1a3a6b,#2563eb)',
+    'linear-gradient(135deg,#065f46,#059669)',
+    'linear-gradient(135deg,#7c3aed,#a855f7)',
+  ];
+  const ICONS = [
+    '<path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v2"/><path d="M15 2v4M8 2v4M3 10h13"/><rect x="2" y="14" width="6" height="6" rx="1"/>',
+    '<circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>',
+    '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+  ];
+  document.getElementById('actus-grid').innerHTML = actus.slice(0,3).map((a,i) => `
+    <a class="actu-card" href="pages/actualites.html">
+      <div class="actu-card-img">
+        ${a.image_url
+          ? `<img src="${a.image_url.startsWith('http') ? a.image_url : 'http://localhost:8000'+a.image_url}" alt="${a.titre}" style="width:100%;height:100%;object-fit:cover"/>`
+          : `<div style="width:100%;height:100%;background:linear-gradient(135deg,#1a3a6b,#2563eb);display:flex;align-items:center;justify-content:center"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.2">${ICONS[i%ICONS.length]}</svg></div>`
+        }
+      </div>
+      <div class="actu-card-body">
+        <div class="actu-card-title">${a.titre}</div>
+        <div class="actu-card-excerpt">${truncate(a.contenu||'', 110)}</div>
+        <div class="actu-card-date">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          ${formatDateTime(a.date_publication)}
+        </div>
+      </div>
+    </a>`).join('');
+}
+
+/* ── Événements ── */
+const DEMO_EVT = [
+  { titre:'Séminaire épidémiologie', date_debut:'2025-10-08', lieu:'ESP/UCAD' },
+  { titre:'Soutenance thèse — Carbone des sols', date_debut:'2025-10-20', lieu:'Amphi UCAD' },
+];
+async function loadEvents() {
+  let evts = [];
+  try { evts = await api.get('/evenements/?limit=4'); } catch {}
+  if (!evts.length) evts = DEMO_EVT;
+  document.getElementById('events-sidebar').innerHTML = evts.slice(0,4).map(e => `
+    <div class="widget-event-item">
+      <div class="widget-event-date">${formatDate(e.date_debut)}</div>
+      <div class="widget-event-title">${truncate(e.titre,52)}</div>
+      ${e.lieu?`<div style="font-size:11px;color:var(--c-text3);margin-top:2px">${e.lieu}</div>`:''}
+    </div>`).join('');
+}
+
+/* ── Stats ── */
+async function loadStats() {
+  try {
+    const [u, p] = await Promise.allSettled([api.get('/utilisateurs/?limit=100'), api.get('/projets/?limit=100')]);
+    const users   = u.status==='fulfilled' ? u.value : [];
+    const projets = p.status==='fulfilled' ? p.value : [];
+    document.getElementById('s-chercheurs').textContent = users.filter(x => x.role?.libelle === 'chercheur').length || '12';
+    document.getElementById('s-projets').textContent = projets.length || '8';
+  } catch {}
+}
+
+loadAxes(); loadPubs(); loadActus(); loadEvents();
+loadEventsHome();
+
+/* ── Événements home ── */
+const DEMO_EVENTS_HOME = [
+  {
+    id:1,
+    titre:'Conférence internationale : MODD 2020',
+    date_debut:'2020-04-28T00:00:00',
+    date_fin:'2020-04-30T00:00:00',
+    lieu:'Saly Mbour, Sénégal',
+    type:'conference',
+    image_url:'images/evt-conference.jpg'
+  },
+  {
+    id:2,
+    titre:'Réunion UMMISCO à Bondy',
+    date_debut:'2015-11-02T00:00:00',
+    date_fin:'2015-11-04T00:00:00',
+    lieu:'Bondy, France',
+    type:'seminaire',
+    image_url:'images/evt-reunion.jpg'
+  },
+  {
+    id:3,
+    titre:'Commisco 2015',
+    date_debut:'2015-11-10T00:00:00',
+    date_fin:'2015-11-13T00:00:00',
+    lieu:'Dakar, Sénégal',
+    type:'conference',
+    image_url:'images/evt-commisco.jpg'
+  },
+];
+
+async function loadEventsHome() {
+  let evts = [];
+  try { evts = await api.get('/evenements/?limit=3'); } catch {}
+  if (!evts.length) evts = DEMO_EVENTS_HOME;
+  const calIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+  document.getElementById('events-home-grid').innerHTML = evts.slice(0,3).map(e => {
+    const imgHtml = e.image_url
+      ? `<img src="${e.image_url}" alt="${e.titre}" style="width:100%;height:100%;object-fit:cover"/>`
+      : `<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+    const bg = e.image_url ? '' : 'background:linear-gradient(135deg,var(--c-primary),#0055bb)';
+    return `
+    <div class="evt-home-card">
+      <div class="evt-home-img" style="${bg}">${imgHtml}</div>
+      <div class="evt-home-body">
+        <div class="evt-home-title">${e.titre}</div>
+        <div class="evt-home-date">
+          ${calIcon}
+          ${formatDate(e.date_debut)}${e.date_fin ? ' to ' + formatDate(e.date_fin) : ''}
+        </div>
+        ${e.lieu ? `<div class="evt-home-lieu">${e.lieu}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Rubriques modals ── */
+var RUBRIQUES = {
+  enjeux: {
+    titre: 'Enjeux — La modélisation à base d\'agents',
+    texte: `<p>Les travaux en modélisation informatique au sein de l'UMMISCO se concentrent sur la famille de méthodes de modélisation connues sous le terme de « modélisation à base d'agents ». L'usage de ces méthodes se développe depuis une vingtaine d'années dans un nombre croissant de disciplines et de champs scientifiques, depuis les sciences sociales jusqu'à l'épidémiologie, en passant par l'écologie ou les sciences de la vie.</p>
+    <p style="margin-top:12px">Contrairement aux méthodes analytiques, elles permettent de reproduire et d'étudier la complexité d'une réalité en conduisant de véritables expérimentations in silico, appelées « simulations », dans lesquelles les dynamiques individuelles et collectives d'entités informatiques appelées « agents » sont programmées, observées et analysées avec autant de détails que nécessaire.</p>
+    <p style="margin-top:12px">UMMISCO a eu dans ce domaine une force de propositions théoriques et de concrétisations méthodologiques. Nous nous sommes attaqués à des verrous scientifiques clés :</p>
+    <ul style="margin-top:8px;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+      <li>L'introduction et la manipulation efficaces de données cartographiques (SIG) dans les simulations agents</li>
+      <li>La conception de langages et de plateformes pour la modélisation multi-échelle</li>
+      <li>L'exploration intelligente et interactive de modèles par simulations massives</li>
+      <li>Le couplage de modèles agents avec des modèles mathématiques</li>
+    </ul>`
+  },
+  axes: {
+    titre: 'Axes scientifiques',
+    texte: `<p>Les travaux des chercheurs se répartissent sur quatre thèmes de recherche :</p>
+    <h3 style="margin-top:16px;color:var(--c-primary)">Données et connaissances</h3>
+    <p>En s'intéressant aux domaines des ontologies et de la fouille de données, il s'agit de proposer des moyens pour caractériser et éliciter des connaissances à partir d'un grand volume de données réelles, et des structures conceptuelles adaptées à la description informatique de connaissances complexes pour les modèles à base d'agents.</p>
+    <h3 style="margin-top:16px;color:var(--c-primary)">Langages et méthodes</h3>
+    <p>Les langages et méthodes de modélisation doivent pouvoir représenter les connaissances sur un domaine. Il s'agira de promouvoir une démarche générique de composition de modèles, appelée co-modélisation, et l'usage de DSL (domain-specific languages) pour l'écriture de modèles appliqués.</p>
+    <h3 style="margin-top:16px;color:var(--c-primary)">Exploration</h3>
+    <p>Compte tenu de la complexité croissante des modèles, il est nécessaire de proposer des solutions algorithmiques intelligentes pour paralléliser et distribuer l'exécution des simulations sur des ressources de calcul haute performance (grille de calcul et cluster).</p>
+    <h3 style="margin-top:16px;color:var(--c-primary)">Plate-forme</h3>
+    <p>La plate-forme commune sera construite par l'intégration continue des contributions à un noyau existant constitué par la plate-forme GAMA et la plate-forme de simulation distribuée Pams.</p>`
+  },
+  projets: {
+    titre: 'Projets de recherche',
+    texte: `<h3 style="color:var(--c-primary)">Génération de populations synthétiques (Gen)</h3>
+    <p>The Gen project aims at combining applied mathematics and computer science approaches in order to incorporate arbitrary data and to generate statistically valid populations of artificial agents. Generic methods applicable to different use cases will be provided and implemented in R and Java.</p>
+    <h3 style="margin-top:16px;color:var(--c-primary)">CAMMISoL — Effet du changement global sur les micro-organismes du sol</h3>
+    <p>L'agriculture africaine est basée principalement sur des cultures pluviales produites par des petits exploitants. Les microorganismes du sol sont les principaux acteurs de la minéralisation des matières organiques. Le maintien de la biodiversité microbienne est primordial pour assurer les services écosystémiques.</p>
+    <h3 style="margin-top:16px;color:var(--c-primary)">QWECI — Observatoire « Climat-Santé » de Barkédji</h3>
+    <p>Ce projet vise à comprendre les liens entre les maladies vectorielles (Paludisme et Fièvre de la Vallée du Rift) et le Climat, par l'observation et la modélisation.</p>
+    <h3 style="margin-top:16px;color:var(--c-primary)">MODEV — Modélisation et développement durable</h3>
+    <p>L'objectif est de doter les acteurs du développement durable d'outils de représentation, de modèles informatiques et mathématiques appropriés à leurs besoins.</p>`
+  },
+  milieux: {
+    titre: 'Milieux et ressources vivantes',
+    texte: `<p>Dans un contexte international (IPBES), national (FRB) et régional (LabEx CeMEB) favorable aux études sur la biodiversité, l'UMI UMMISCO souhaite capitaliser les travaux menés par ses membres sur cette thématique. Les modèles développés reposent sur une approche mécaniste et concernent des ressources vivantes en milieu aquatique et terrestre.</p>
+    <p style="margin-top:12px">Nous étudions plus particulièrement :</p>
+    <ul style="margin-top:8px;padding-left:20px;display:flex;flex-direction:column;gap:6px">
+      <li>La dispersion des œufs et larves d'espèces marines (projet COMPO)</li>
+      <li>La dynamique de ressources marines exploitées (projet AWA)</li>
+      <li>La dynamique de plantes aquatiques envahissantes</li>
+      <li>La dynamique de micro-organismes du sol</li>
+      <li>La biomasse de forêts tropicales humides</li>
+      <li>La dynamique de grands parcs animaliers</li>
+    </ul>
+    <h3 style="margin-top:16px;color:var(--c-primary)">Projets</h3>
+    <p>Dispersion des œufs et larves d'espèces marines : <a href="http://www.compo.ird.fr/" target="_blank" style="color:var(--c-primary)">Projet COMPO</a></p>
+    <p style="margin-top:6px">Dynamique de ressources marines exploitées : <a href="http://www.awa-project.org/" target="_blank" style="color:var(--c-primary)">Projet AWA</a></p>`
+  },
+  epidemio: {
+    titre: 'Epidémiologie et santé',
+    texte: `<p>Les sciences de la santé ont toujours été un champ extrêmement prisé par les théoriciens. La communauté médicale a rapidement compris la plus-value de ces approches théoriques, permettant de co-construire des projets de recherche donnant lieu à des innovations méthodologiques.</p>
+    <h3 style="margin-top:16px;color:var(--c-primary)">Dynamique spatio-temporelle des maladies infectieuses</h3>
+    <p>Des méthodes d'analyse de séries temporelles en ondelettes ont été développées, permettant d'analyser la saisonnalité des épidémies. La comparaison géographique permet de reconstruire la dynamique dans l'espace et le temps, comme dans le cas du paludisme en Afrique de l'Est.</p>
+    <h3 style="margin-top:16px;color:var(--c-primary)">Le ratio reproductif de base (R0)</h3>
+    <p>L'épidémiologie mathématique a développé un outil puissant : le R0, qui quantifie le nombre de nouvelles infections moyen dû à un individu infecté dans une population naïve. Nous développons des méthodes permettant de quantifier ce ratio au plus près de la réalité épidémiologique.</p>
+    <h3 style="margin-top:16px;color:var(--c-primary)">Dynamique écologique et évolutive des pathogènes</h3>
+    <p>Nous étudions l'influence protectrice de la biodiversité sur les maladies infectieuses. La concomitance des dynamiques écologiques et évolutives est fondamentale pour certains types de virus, notamment les virus de grippe aviaire.</p>
+    <h3 style="margin-top:16px;color:var(--c-primary)">Optimisation des politiques de contrôle</h3>
+    <p>Les nouvelles méthodes d'optimisation (algorithmes génétiques) commencent à être utilisées en santé publique afin d'optimiser l'efficacité des stratégies. L'application de ces méthodes apporte des informations quantitatives aux autorités publiques.</p>`
+  },
+  maths: {
+    titre: 'Méthodes mathématiques pour la dynamique des populations',
+    texte: `<p>Les champs des mathématiques couverts au sein de l'unité sont les systèmes dynamiques (équations différentielles, équations aux différences finies, équations à retard), les modèles stochastiques, la théorie des jeux, la théorie du contrôle et les méthodes d'agrégation de variables.</p>
+    <h3 style="margin-top:16px;color:var(--c-primary)">Les systèmes complexes</h3>
+    <p>Les modèles développés concernent principalement l'écologie (interactions proies-prédateurs, compétition, parasitisme, pêche) et l'épidémiologie, faisant intervenir un grand nombre d'entités dont les interactions induisent une dynamique globale difficile à analyser.</p>
+    <h3 style="margin-top:16px;color:var(--c-primary)">Axes thématiques marquants</h3>
+    <p><strong>Grands herbivores au Kenya :</strong> Nous développons des modèles mathématiques pour l'évolution démographique de populations animales dans les Parcs Nationaux du Kenya, prenant en compte les observations collectées sur 40 ans dans le Parc National d'Amboseli.</p>
+    <p style="margin-top:8px"><strong>Pêcheries au Maroc et au Sénégal :</strong> Nous réalisons des modèles bioéconomiques qui s'intéressent à la viabilité de l'activité de pêche (sardine, poulpe) en fonction des différents types de pêche.</p>
+    <p style="margin-top:8px"><strong>Epidémiologie mathématique :</strong> Maladies à vecteurs (leishmaniose, chikungunya, peste), à transmission directe (grippe, rougeole), SIDA et tuberculose, modèles stochastiques avec saisons.</p>`
+  }
+};
+
+function openRubrique(key) {
+  var r = RUBRIQUES[key]; if (!r) return;
+  document.getElementById('rubrique-title').textContent = r.titre;
+  document.getElementById('rubrique-body').innerHTML = r.texte;
+  document.getElementById('modal-rubrique').classList.add('open');
+}
+function closeRubrique() { document.getElementById('modal-rubrique').classList.remove('open'); }
+document.getElementById('modal-rubrique').addEventListener('click', function(e) {
+  if (e.target.id === 'modal-rubrique') closeRubrique();
+});
+
+/* ── Compteurs animés ── */
+function animateCounters() {
+  const items = document.querySelectorAll('.chiffre-num');
+  items.forEach(el => {
+    const target = +el.dataset.target;
+    let current = 0;
+    const step = Math.ceil(target / 40);
+    const tick = setInterval(() => {
+      current = Math.min(current + step, target);
+      el.textContent = current;
+      if (current >= target) clearInterval(tick);
+    }, 40);
+  });
+}
+
+// Déclencher quand la section devient visible
+const chiffresObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { animateCounters(); chiffresObs.disconnect(); } });
+}, { threshold: 0.3 });
+const chiffresSection = document.querySelector('.chiffres-section');
+if (chiffresSection) chiffresObs.observe(chiffresSection);
+</script>
+</body>
+</html>

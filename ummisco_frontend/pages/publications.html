@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Publications — UMMISCO</title>
+  <link rel="stylesheet" href="../css/global.css"/>
+  <style>
+    .filters-bar { display:flex;gap:12px;flex-wrap:wrap;padding:20px 0;border-bottom:1px solid var(--c-border);margin-bottom:28px;align-items:center; }
+    .search-box  { flex:1;min-width:220px;background:#fff;border:1px solid var(--c-border);border-radius:var(--radius-sm);padding:9px 14px;font-size:14px;color:var(--c-text); }
+    .search-box:focus { border-color:var(--c-primary);outline:none; }
+    .filter-pill { padding:6px 14px;border-radius:100px;border:1px solid var(--c-border);font-size:13px;cursor:pointer;transition:all var(--transition);color:var(--c-text2);background:#fff; }
+    .filter-pill:hover  { border-color:var(--c-primary);color:var(--c-primary); }
+    .filter-pill.active { background:var(--c-primary);color:#fff;border-color:var(--c-primary); }
+    .sort-select { background:#fff;border:1px solid var(--c-border);border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;color:var(--c-text);cursor:pointer; }
+    .pub-item { background:#fff;border:1px solid var(--c-border);border-radius:var(--radius-md);padding:20px;display:grid;grid-template-columns:1fr auto;gap:16px;transition:box-shadow var(--transition);border-left:4px solid var(--c-primary);cursor:pointer; }
+    .pub-item:hover { box-shadow:var(--shadow-md); }
+    .pub-item-meta  { display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px; }
+    .pub-item-title { font-size:.95rem;font-weight:700;color:var(--c-primary);margin-bottom:6px;line-height:1.4; }
+    .pub-item-resume{ font-size:13px;color:var(--c-text2);line-height:1.5; }
+    .pub-item-footer{ display:flex;gap:12px;align-items:center;margin-top:10px;flex-wrap:wrap;font-size:12px;color:var(--c-text3); }
+    .pub-item-footer svg { color:var(--c-text3); }
+    .pub-item-right { display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:80px; }
+    .doi-link { font-family:var(--font-mono);font-size:11px;color:var(--c-primary); }
+    .doi-link:hover { text-decoration:underline; }
+    .result-count { font-size:13px;color:var(--c-text3);margin-bottom:16px; }
+    .pub-list { display:flex;flex-direction:column;gap:14px; }
+    @media(max-width:600px){ .pub-item { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div class="page-header-inst">
+  <div class="container">
+    <h1 data-i18n="page.pubs.title">Publications</h1>
+    <p>Travaux de recherche publiés par les membres de l'UMMISCO</p>
+  </div>
+</div>
+
+<div style="padding:40px 0 64px">
+  <div class="container">
+    <div class="filters-bar">
+      <input class="search-box" type="search" id="search" placeholder="Rechercher par titre, auteur, revue…" oninput="filter()"/>
+      <div style="display:flex;gap:8px;flex-wrap:wrap" id="axe-pills">
+        <button class="filter-pill active" onclick="setAxe(null,this)">Tous les axes</button>
+      </div>
+      <select class="sort-select" id="sort" onchange="filter()">
+        <option value="date">Plus récentes</option>
+        <option value="annee">Par année</option>
+        <option value="titre">Alphabétique</option>
+      </select>
+    </div>
+    <div class="result-count" id="result-count"></div>
+    <div class="pub-list" id="pub-list">
+      <div class="skeleton" style="height:110px;border-radius:var(--radius-md)"></div>
+      <div class="skeleton" style="height:110px;border-radius:var(--radius-md)"></div>
+      <div class="skeleton" style="height:110px;border-radius:var(--radius-md)"></div>
+    </div>
+    <div style="text-align:center;margin-top:28px;display:none" id="load-more-wrap">
+      <button class="btn btn--ghost" onclick="loadMore()">Charger plus</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal détail -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal" style="max-width:660px">
+    <div class="modal-header">
+      <span class="modal-title" id="detail-title" style="font-size:.95rem;max-width:90%;line-height:1.3"></span>
+      <div class="modal-close" onclick="closeDetail()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div id="detail-body"></div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+initNav({ active:'recherches', base:'../' }); initFooter({ base:'../' });
+
+let allPubs = [], axes = [], activeAxe = null, displayCount = 15;
+
+async function init() {
+  [allPubs, axes] = await Promise.all([
+    api.get('/publications/?limit=500').catch(() => []),
+    api.get('/axes/').catch(() => []),
+  ]);
+  const pills = document.getElementById('axe-pills');
+  axes.forEach(a => { pills.innerHTML += `<button class="filter-pill" onclick="setAxe(${a.id},this)">${a.nom}</button>`; });
+  filter();
+}
+
+function setAxe(id, btn) {
+  activeAxe = id; displayCount = 15;
+  document.querySelectorAll('#axe-pills .filter-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filter();
+}
+
+function filter() {
+  const q    = document.getElementById('search').value.toLowerCase();
+  const sort = document.getElementById('sort').value;
+  let list   = allPubs.filter(p =>
+    (!activeAxe || p.axe?.id === activeAxe) &&
+    (!q || p.titre.toLowerCase().includes(q) || (p.auteur?.nom||'').toLowerCase().includes(q) || (p.revue||'').toLowerCase().includes(q))
+  );
+  if (sort === 'date')  list.sort((a,b) => new Date(b.date_publication||b.created_at) - new Date(a.date_publication||a.created_at));
+  if (sort === 'annee') list.sort((a,b) => (b.annee||0) - (a.annee||0));
+  if (sort === 'titre') list.sort((a,b) => a.titre.localeCompare(b.titre, 'fr'));
+  document.getElementById('result-count').textContent = `${list.length} publication${list.length !== 1 ? 's' : ''} trouvée${list.length !== 1 ? 's' : ''}`;
+  render(list.slice(0, displayCount));
+  document.getElementById('load-more-wrap').style.display = list.length > displayCount ? 'block' : 'none';
+  document._filteredPubs = list;
+}
+
+function loadMore() { displayCount += 15; filter(); }
+
+function render(pubs) {
+  const container = document.getElementById('pub-list');
+  if (!pubs.length) { container.innerHTML = '<div style="text-align:center;padding:64px;color:var(--c-text3)">Aucune publication trouvée.</div>'; return; }
+  container.innerHTML = pubs.map(p => `
+    <div class="pub-item" onclick="openDetail(${p.id})">
+      <div>
+        <div class="pub-item-meta">
+          ${p.axe ? `<span class="badge badge--protege" style="font-size:11px">${p.axe.nom}</span>` : ''}
+          ${p.peer_reviewed ? '<span class="badge badge--publie" style="font-size:11px">Peer-reviewed</span>' : ''}
+          ${badgeHtml(p.visibilite)}
+        </div>
+        <div class="pub-item-title">${p.titre}</div>
+        <div class="pub-item-resume">${truncate(p.resume||'Résumé non disponible.',160)}</div>
+        <div class="pub-item-footer">
+          <span style="display:flex;align-items:center;gap:4px">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            ${p.auteur?.prenom||''} ${p.auteur?.nom||''}
+          </span>
+          ${p.revue ? `<span style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>${p.revue}</span>` : ''}
+          ${p.annee ? `<span>${p.annee}</span>` : ''}
+        </div>
+      </div>
+      <div class="pub-item-right">
+        ${p.doi ? `<a class="doi-link" href="https://doi.org/${p.doi}" target="_blank" onclick="event.stopPropagation()">DOI: ${p.doi}</a>` : ''}
+        ${p.fichier_pdf_url ? `<a class="btn btn--ghost btn--sm" href="${p.fichier_pdf_url}" target="_blank" onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:5px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function openDetail(id) {
+  const p = allPubs.find(x => x.id === id); if (!p) return;
+  document.getElementById('detail-title').textContent = p.titre;
+  document.getElementById('detail-body').innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      ${p.axe ? `<span class="badge badge--protege">${p.axe.nom}</span>` : ''}
+      ${p.peer_reviewed ? '<span class="badge badge--publie">Peer-reviewed</span>' : ''}
+      ${badgeHtml(p.visibilite)}
+    </div>
+    <p style="font-size:14px;color:var(--c-text2);line-height:1.7;margin-bottom:14px">${p.resume||'<em>Résumé non disponible.</em>'}</p>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--c-text2)">
+      <div>Auteur : <strong>${p.auteur?.prenom||''} ${p.auteur?.nom||''}</strong></div>
+      ${p.revue ? `<div>Revue : <strong>${p.revue}</strong></div>` : ''}
+      ${p.annee ? `<div>Année : <strong>${p.annee}</strong></div>` : ''}
+      ${p.doi ? `<div>DOI : <a href="https://doi.org/${p.doi}" target="_blank" style="color:var(--c-primary)">${p.doi}</a></div>` : ''}
+      ${p.url_scholar ? `<div><a href="${p.url_scholar}" target="_blank" class="btn btn--ghost btn--sm" style="width:fit-content">Voir sur Google Scholar</a></div>` : ''}
+      ${p.fichier_pdf_url ? `<div><a href="${p.fichier_pdf_url}" target="_blank" class="btn btn--primary btn--sm" style="width:fit-content;display:inline-flex;align-items:center;gap:6px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Télécharger le PDF</a></div>` : ''}
+    </div>`;
+  document.getElementById('modal-detail').classList.add('open');
+}
+function closeDetail() { document.getElementById('modal-detail').classList.remove('open'); }
+document.getElementById('modal-detail').addEventListener('click', e => { if (e.target.id === 'modal-detail') closeDetail(); });
+
+init();
+</script>
+<script src="../js/i18n.js"></script>
+</body>
+</html>

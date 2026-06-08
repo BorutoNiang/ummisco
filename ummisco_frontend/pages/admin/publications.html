@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Publications — UMMISCO Admin</title>
+  <link rel="stylesheet" href="../../css/global.css"/>
+  <style>
+    .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+    .search-box{flex:1;min-width:220px;background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:8px 12px;font-size:13px;color:#1f2937;}
+    .search-box:focus{border-color:#003f87;outline:none;}
+    .filter-select{background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:8px 12px;font-size:13px;color:#374151;cursor:pointer;}
+    .pub-title{font-weight:600;font-size:13px;color:#1e293b;margin-bottom:2px;}
+    .pub-meta{font-size:11px;color:#94a3b8;}
+    .actions-cell{display:flex;gap:6px;align-items:center;}
+    .empty-msg{text-align:center;padding:48px;color:#94a3b8;font-size:13px;}
+  </style>
+</head>
+<body>
+<div class="toolbar">
+  <input class="search-box" type="search" id="search" placeholder="Rechercher une publication…" oninput="filterList()"/>
+  <select class="filter-select" id="filter-statut" onchange="loadPubs()">
+    <option value="">Tous les statuts</option>
+    <option value="publie">Publié</option>
+    <option value="en_attente">En attente</option>
+    <option value="brouillon">Brouillon</option>
+    <option value="rejete">Rejeté</option>
+  </select>
+  <select class="filter-select" id="filter-axe" onchange="loadPubs()">
+    <option value="">Tous les axes</option>
+  </select>
+  <div id="add-pub-btn"></div>
+</div>
+
+<div class="card" style="padding:0">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Titre</th><th>Auteur</th><th>Axe</th>
+          <th>Statut</th><th>Visibilité</th><th>Date</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="pub-tbody">
+        <tr><td colspan="7" style="text-align:center;padding:32px"><div class="spinner" style="margin:0 auto"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal création/édition -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Nouvelle publication</span>
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="pub-form" class="gap-form">
+      <div class="form-group">
+        <label class="form-label">Titre *</label>
+        <input class="form-input" id="f-titre" required placeholder="Titre de la publication"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Résumé</label>
+        <textarea class="form-input" id="f-resume" rows="3" placeholder="Résumé…"></textarea>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Axe thématique</label>
+          <select class="form-input" id="f-axe"><option value="">— Aucun —</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Visibilité</label>
+          <select class="form-input" id="f-visibilite">
+            <option value="public">Public</option>
+            <option value="protege">Protégé</option>
+            <option value="prive">Privé</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Revue</label>
+          <input class="form-input" id="f-revue" placeholder="Nature, ICML…"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Année</label>
+          <input class="form-input" id="f-annee" type="number" placeholder="2025"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">DOI</label>
+        <input class="form-input" id="f-doi" placeholder="10.xxxx/xxxxx"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL Google Scholar</label>
+        <input class="form-input" id="f-scholar" type="url"/>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+        <input type="checkbox" id="f-peer" style="width:14px;height:14px"/>
+        Article peer-reviewed (publication directe)
+      </label>
+      <div id="form-alert"></div>
+      <div class="flex" style="gap:8px;justify-content:flex-end">
+        <button type="button" class="btn btn--ghost" onclick="closeModal()">Annuler</button>
+        <button type="submit" class="btn btn--primary" id="form-submit">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal validation -->
+<div class="modal-overlay" id="modal-valid">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <span class="modal-title">Valider la publication</span>
+      <button class="modal-close" onclick="closeValidModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <p class="text-muted" style="margin-bottom:14px;font-size:13px" id="valid-desc"></p>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label">Commentaire (optionnel)</label>
+      <textarea class="form-input" id="valid-comment" rows="3" placeholder="Motif…"></textarea>
+    </div>
+    <div class="flex" style="gap:8px;justify-content:flex-end">
+      <button class="btn btn--ghost" onclick="closeValidModal()">Annuler</button>
+      <button class="btn btn--danger" onclick="doValidation('rejeter')">Rejeter</button>
+      <button class="btn btn--primary" onclick="doValidation('approuver')">Approuver</button>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/admin-layout.js"></script>
+<script>
+initAdminLayout('publications');
+const _rpub = Auth.getRole();
+const _pubBtnLabel = _rpub === 'doctorant'
+  ? '+ Proposer une publication <small style="color:#d97706">(validation requise)</small>'
+  : '+ Nouvelle publication';
+document.getElementById('add-pub-btn').innerHTML = `<button class="btn btn--primary" onclick="openModal()">${_pubBtnLabel}</button>`;
+let allPubs=[], axes=[], editId=null, validId=null;
+
+async function init() {
+  axes = await api.get('/axes/').catch(()=>[]);
+  const fa = document.getElementById('filter-axe');
+  const ff = document.getElementById('f-axe');
+  axes.forEach(a => { fa.innerHTML += `<option value="${a.id}">${a.nom}</option>`; ff.innerHTML += `<option value="${a.id}">${a.nom}</option>`; });
+  loadPubs();
+}
+
+async function loadPubs() {
+  const statut = document.getElementById('filter-statut').value;
+  const axeId  = document.getElementById('filter-axe').value;
+  let url = '/publications/?limit=200';
+  if (statut) url += `&statut=${statut}`;
+  if (axeId)  url += `&axe_id=${axeId}`;
+  try { allPubs = await api.get(url); } catch { allPubs = []; }
+  renderTable();
+}
+
+function filterList() { renderTable(); }
+
+function renderTable() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const f = allPubs.filter(p => !q || p.titre.toLowerCase().includes(q) || (p.auteur?.nom||'').toLowerCase().includes(q));
+  const tbody = document.getElementById('pub-tbody');
+  if (!f.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-msg">Aucune publication trouvée.</div></td></tr>`; return; }
+  tbody.innerHTML = f.map(p => `
+    <tr>
+      <td>
+        <div class="pub-title">${truncate(p.titre,65)}</div>
+        <div class="pub-meta">${p.peer_reviewed?'Peer-reviewed · ':''}${p.doi?'DOI: '+p.doi:''}</div>
+      </td>
+      <td style="font-size:13px">${p.auteur?.prenom||''} ${p.auteur?.nom||''}</td>
+      <td style="font-size:12px;color:#64748b">${p.axe?.nom||'—'}</td>
+      <td>${statutBadge(p.statut)}</td>
+      <td>${badgeHtml(p.visibilite)}</td>
+      <td style="font-size:11px;color:#94a3b8;font-family:monospace">${formatDate(p.date_publication||p.created_at)}</td>
+      <td>
+        <div class="actions-cell">
+          ${p.statut==='en_attente'?`<button class="btn btn--sm btn--primary" onclick="openValidModal(${p.id},'${truncate(p.titre,35)}')">Valider</button>`:''}
+          <button class="btn btn--ghost btn--sm" onclick="openModal(${p.id})">Modifier</button>
+          <button class="btn btn--danger btn--sm" onclick="deletePub(${p.id})">Supprimer</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function openModal(id=null) {
+  editId=id;
+  document.getElementById('modal-title').textContent = id?'Modifier la publication':'Nouvelle publication';
+  document.getElementById('form-alert').innerHTML='';
+  document.getElementById('pub-form').reset();
+  if(id){const p=allPubs.find(x=>x.id===id);if(p){document.getElementById('f-titre').value=p.titre||'';document.getElementById('f-resume').value=p.resume||'';document.getElementById('f-axe').value=p.axe?.id||'';document.getElementById('f-visibilite').value=p.visibilite||'public';document.getElementById('f-revue').value=p.revue||'';document.getElementById('f-annee').value=p.annee||'';document.getElementById('f-doi').value=p.doi||'';document.getElementById('f-scholar').value=p.url_scholar||'';document.getElementById('f-peer').checked=p.peer_reviewed;}}
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');editId=null;}
+
+document.getElementById('pub-form').addEventListener('submit',async(e)=>{
+  e.preventDefault();const btn=document.getElementById('form-submit');btn.disabled=true;btn.textContent='…';
+  const payload={titre:document.getElementById('f-titre').value,resume:document.getElementById('f-resume').value||null,axe_id:document.getElementById('f-axe').value?+document.getElementById('f-axe').value:null,visibilite:document.getElementById('f-visibilite').value,revue:document.getElementById('f-revue').value||null,annee:document.getElementById('f-annee').value?+document.getElementById('f-annee').value:null,doi:document.getElementById('f-doi').value||null,url_scholar:document.getElementById('f-scholar').value||null,peer_reviewed:document.getElementById('f-peer').checked};
+  try{if(editId){await api.patch(`/publications/${editId}`,payload);Toast.success('Mise à jour effectuée');}else{await api.post('/publications/',payload);Toast.success('Publication créée');}closeModal();loadPubs();}
+  catch(err){document.getElementById('form-alert').innerHTML=`<div class="alert alert--error">${err.message}</div>`;}
+  btn.disabled=false;btn.textContent='Enregistrer';
+});
+
+function openValidModal(id,titre){validId=id;document.getElementById('valid-desc').textContent=truncate(titre,70);document.getElementById('valid-comment').value='';document.getElementById('modal-valid').classList.add('open');}
+function closeValidModal(){document.getElementById('modal-valid').classList.remove('open');validId=null;}
+async function doValidation(decision){if(!validId)return;try{await api.post(`/publications/${validId}/valider`,{decision,commentaire:document.getElementById('valid-comment').value});Toast.success(decision==='approuver'?'Approuvée':'Rejetée');closeValidModal();loadPubs();}catch(e){Toast.error(e.message);}}
+async function deletePub(id){if(!confirm('Supprimer cette publication ?'))return;try{await api.delete(`/publications/${id}`);Toast.success('Supprimée');loadPubs();}catch(e){Toast.error(e.message);}}
+
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
+document.getElementById('modal-valid').addEventListener('click',e=>{if(e.target.id==='modal-valid')closeValidModal();});
+init();
+</script>
+</body>
+</html>

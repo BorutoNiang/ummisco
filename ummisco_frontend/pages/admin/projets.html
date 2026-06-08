@@ -1,0 +1,275 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Projets — UMMISCO Admin</title>
+  <link rel="stylesheet" href="../../css/global.css"/>
+  <style>
+    .toolbar { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+    .search-box { flex:1; min-width:200px; background:var(--c-surface); border:1px solid var(--c-border); border-radius:var(--radius-md); padding:9px 14px; font-size:14px; color:var(--c-text); }
+    .search-box:focus { border-color:var(--c-primary); outline:none; }
+    .filter-select { background:var(--c-surface); border:1px solid var(--c-border); border-radius:var(--radius-md); padding:9px 14px; font-size:14px; color:var(--c-text); }
+    .proj-card {
+      background:var(--c-surface); border:1px solid var(--c-border);
+      border-radius:var(--radius-lg); padding:22px;
+      transition:all var(--transition); cursor:pointer;
+      position:relative; overflow:hidden;
+    }
+    .proj-card:hover { border-color:var(--c-border2); transform:translateY(-2px); box-shadow:var(--shadow-md); }
+    .proj-card::before {
+      content:''; position:absolute; top:0; left:0; width:3px; height:100%;
+      background:var(--proj-color,var(--c-primary));
+    }
+    .proj-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
+    .proj-title  { font-weight:600; font-size:15px; line-height:1.3; }
+    .proj-meta   { font-size:12px; color:var(--c-text3); margin-top:6px; display:flex; gap:14px; flex-wrap:wrap; }
+    .proj-actions { display:flex; gap:6px; flex-shrink:0; }
+    .statut-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:3px 10px; border-radius:100px; font-size:11px; font-weight:500;
+    }
+    .s-en_cours  { background:rgba(6,214,160,.12); color:var(--c-accent); }
+    .s-planifie  { background:rgba(59,130,246,.12); color:var(--c-primary); }
+    .s-termine   { background:rgba(136,146,164,.12); color:var(--c-text3); }
+    .s-suspendu  { background:rgba(245,158,11,.12); color:var(--c-warn); }
+    .prog-wrap { margin-top:12px; }
+    .prog-label { display:flex; justify-content:space-between; font-size:12px; color:var(--c-text3); margin-bottom:5px; }
+    .prog-bg { height:4px; background:var(--c-surface2); border-radius:2px; overflow:hidden; }
+    .prog-fill { height:100%; border-radius:2px; background:var(--proj-color,var(--c-primary)); transition:width .8s ease; }
+  </style>
+</head>
+<body>
+
+<div class="toolbar">
+  <input class="search-box" type="search" id="search" placeholder="Rechercher un projet…" oninput="renderCards()"/>
+  <select class="filter-select" id="filter-statut" onchange="renderCards()">
+    <option value="">Tous les statuts</option>
+    <option value="en_cours">En cours</option>
+    <option value="planifie">Planifié</option>
+    <option value="termine">Terminé</option>
+    <option value="suspendu">Suspendu</option>
+  </select>
+  <select class="filter-select" id="filter-axe" onchange="loadData()">
+    <option value="">Tous les axes</option>
+  </select>
+  <div id="add-proj-btn"></div>
+</div>
+
+<!-- Stats rapides -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px" id="stats-row">
+  <div class="card" style="padding:16px 20px;text-align:center">
+    <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:800" id="s-total">—</div>
+    <div style="font-size:12px;color:var(--c-text3)">Total</div>
+  </div>
+  <div class="card" style="padding:16px 20px;text-align:center">
+    <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--c-accent)" id="s-cours">—</div>
+    <div style="font-size:12px;color:var(--c-text3)">En cours</div>
+  </div>
+  <div class="card" style="padding:16px 20px;text-align:center">
+    <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--c-primary)" id="s-plan">—</div>
+    <div style="font-size:12px;color:var(--c-text3)">Planifiés</div>
+  </div>
+  <div class="card" style="padding:16px 20px;text-align:center">
+    <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--c-text3)" id="s-fin">—</div>
+    <div style="font-size:12px;color:var(--c-text3)">Terminés</div>
+  </div>
+</div>
+
+<div class="grid-2" id="proj-grid">
+  <div class="skeleton" style="height:160px;border-radius:var(--radius-lg)"></div>
+  <div class="skeleton" style="height:160px;border-radius:var(--radius-lg)"></div>
+  <div class="skeleton" style="height:160px;border-radius:var(--radius-lg)"></div>
+  <div class="skeleton" style="height:160px;border-radius:var(--radius-lg)"></div>
+</div>
+
+<!-- Modal création / édition -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Nouveau projet</span>
+      <div class="modal-close" onclick="closeModal()">✕</div>
+    </div>
+    <form id="proj-form" class="gap-form">
+      <div class="form-group">
+        <label class="form-label">Titre *</label>
+        <input class="form-input" id="f-titre" required placeholder="Titre du projet"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-input" id="f-desc" rows="4" placeholder="Description du projet…"></textarea>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Axe thématique</label>
+          <select class="form-input" id="f-axe"><option value="">— Aucun —</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Statut</label>
+          <select class="form-input" id="f-statut">
+            <option value="planifie">Planifié</option>
+            <option value="en_cours">En cours</option>
+            <option value="termine">Terminé</option>
+            <option value="suspendu">Suspendu</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Date début</label>
+          <input class="form-input" id="f-debut" type="date"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date fin</label>
+          <input class="form-input" id="f-fin" type="date"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Budget (FCFA)</label>
+        <input class="form-input" id="f-budget" type="number" min="0" placeholder="0"/>
+      </div>
+      <div id="form-alert"></div>
+      <div class="flex" style="gap:10px;justify-content:flex-end">
+        <button type="button" class="btn btn--ghost" onclick="closeModal()">Annuler</button>
+        <button type="submit" class="btn btn--accent" id="form-submit">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/admin-layout.js"></script>
+<script>
+initAdminLayout('projets');
+
+// Bouton selon le rôle
+const _rp = Auth.getRole();
+const _addProjLabel = _rp === 'doctorant'
+  ? '+ Proposer un projet <small style="color:#d97706">(soumis à validation)</small>'
+  : '+ Nouveau projet';
+document.getElementById('add-proj-btn').innerHTML = `<button class="btn btn--primary" onclick="openModal()">${_addProjLabel}</button>`;
+
+const STATUT_COLORS = { en_cours:'var(--c-accent)', planifie:'var(--c-primary)', termine:'var(--c-text3)', suspendu:'var(--c-warn)' };
+let allProjets=[], axes=[], editId=null;
+
+function calcProgress(proj) {
+  if (!proj.date_debut || !proj.date_fin) return null;
+  const start = new Date(proj.date_debut), end = new Date(proj.date_fin), now = new Date();
+  if (now < start) return 0;
+  if (now > end)   return 100;
+  return Math.round(((now-start)/(end-start))*100);
+}
+
+async function init() {
+  axes = await api.get('/axes/').catch(()=>[]);
+  const fa=document.getElementById('filter-axe'), ff=document.getElementById('f-axe');
+  axes.forEach(a=>{ fa.innerHTML+=`<option value="${a.id}">${a.nom}</option>`; ff.innerHTML+=`<option value="${a.id}">${a.nom}</option>`; });
+  loadData();
+}
+
+async function loadData() {
+  const axeId=document.getElementById('filter-axe').value;
+  let url='/projets/?limit=200'; if(axeId) url+=`&axe_id=${axeId}`;
+  allProjets = await api.get(url).catch(()=>[]);
+  // Stats
+  document.getElementById('s-total').textContent = allProjets.length;
+  document.getElementById('s-cours').textContent = allProjets.filter(p=>p.statut==='en_cours').length;
+  document.getElementById('s-plan').textContent  = allProjets.filter(p=>p.statut==='planifie').length;
+  document.getElementById('s-fin').textContent   = allProjets.filter(p=>p.statut==='termine').length;
+  renderCards();
+}
+
+function renderCards() {
+  const q=document.getElementById('search').value.toLowerCase();
+  const s=document.getElementById('filter-statut').value;
+  const filtered=allProjets.filter(p=>(!q||p.titre.toLowerCase().includes(q))&&(!s||p.statut===s));
+  const grid=document.getElementById('proj-grid');
+  if(!filtered.length){ grid.innerHTML='<p class="text-muted" style="grid-column:1/-1;text-align:center;padding:48px">Aucun projet trouvé</p>'; return; }
+  const color = p => STATUT_COLORS[p.statut]||'var(--c-primary)';
+  grid.innerHTML=filtered.map(p=>{
+    const prog=calcProgress(p);
+    return `
+    <div class="proj-card" style="--proj-color:${color(p)}">
+      <div class="proj-header">
+        <div>
+          <div class="proj-title">${truncate(p.titre,70)}</div>
+          <div class="proj-meta">
+            <span>🧑‍🔬 ${p.responsable?.prenom||''} ${p.responsable?.nom||''}</span>
+            ${p.axe?`<span>📌 ${p.axe.nom}</span>`:''}
+            ${p.budget?`<span>💰 ${Number(p.budget).toLocaleString('fr-FR')} FCFA</span>`:''}
+          </div>
+        </div>
+        <span class="statut-badge s-${p.statut}">${p.statut.replace('_',' ')}</span>
+      </div>
+      <p style="font-size:13px;color:var(--c-text2);margin-bottom:12px">${truncate(p.description||'',100)}</p>
+      ${prog!==null?`
+        <div class="prog-wrap">
+          <div class="prog-label">
+            <span>${formatDate(p.date_debut)}</span>
+            <span>${prog}%</span>
+            <span>${formatDate(p.date_fin)}</span>
+          </div>
+          <div class="prog-bg"><div class="prog-fill" data-w="${prog}" style="width:0%"></div></div>
+        </div>
+      `:''}
+      <div class="proj-actions" style="margin-top:14px">
+        <button class="btn btn--ghost btn--sm" onclick="openModal(${p.id})">Modifier Modifier</button>
+        <button class="btn btn--sm btn--danger" onclick="deleteProj(${p.id})">Supprimer</button>
+      </div>
+    </div>`;
+  }).join('');
+  setTimeout(()=>{ document.querySelectorAll('.prog-fill').forEach(el=>el.style.width=el.dataset.w+'%'); },80);
+}
+
+function openModal(id=null){
+  editId=id;
+  document.getElementById('modal-title').textContent=id?'Modifier le projet':'Nouveau projet';
+  document.getElementById('form-alert').innerHTML='';
+  document.getElementById('proj-form').reset();
+  if(id){
+    const p=allProjets.find(x=>x.id===id);
+    if(p){
+      document.getElementById('f-titre').value  =p.titre;
+      document.getElementById('f-desc').value   =p.description||'';
+      document.getElementById('f-axe').value    =p.axe?.id||'';
+      document.getElementById('f-statut').value =p.statut;
+      document.getElementById('f-debut').value  =p.date_debut||'';
+      document.getElementById('f-fin').value    =p.date_fin||'';
+      document.getElementById('f-budget').value =p.budget||'';
+    }
+  }
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); editId=null; }
+
+document.getElementById('proj-form').addEventListener('submit', async(e)=>{
+  e.preventDefault();
+  const btn=document.getElementById('form-submit'); btn.disabled=true; btn.textContent='…';
+  const payload={
+    titre:      document.getElementById('f-titre').value,
+    description:document.getElementById('f-desc').value||null,
+    axe_id:     document.getElementById('f-axe').value?+document.getElementById('f-axe').value:null,
+    statut:     document.getElementById('f-statut').value,
+    date_debut: document.getElementById('f-debut').value||null,
+    date_fin:   document.getElementById('f-fin').value||null,
+    budget:     document.getElementById('f-budget').value?+document.getElementById('f-budget').value:null,
+  };
+  try{
+    if(editId){ await api.patch(`/projets/${editId}`,payload); Toast.success('Projet mis à jour'); }
+    else      { await api.post('/projets/',payload);           Toast.success('Projet créé'); }
+    closeModal(); loadData();
+  }catch(err){ document.getElementById('form-alert').innerHTML=`<div class="alert alert--error">${err.message}</div>`; }
+  btn.disabled=false; btn.textContent='Enregistrer';
+});
+
+async function deleteProj(id){
+  if(!confirm('Supprimer ce projet ?')) return;
+  try{ await api.delete(`/projets/${id}`); Toast.success('Projet supprimé'); loadData(); }
+  catch(e){ Toast.error(e.message); }
+}
+
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
+init();
+</script>
+</body>
+</html>
