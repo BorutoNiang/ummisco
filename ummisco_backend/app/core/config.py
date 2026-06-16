@@ -39,6 +39,14 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
+        # Railway injecte DATABASE_URL directement
+        import os
+        db_url = os.getenv("DATABASE_URL")
+        if db_url:
+            # Railway utilise mysql:// — on convertit pour SQLAlchemy
+            if db_url.startswith("mysql://"):
+                db_url = db_url.replace("mysql://", "mysql+pymysql://", 1)
+            return db_url
         return (
             f"mysql+pymysql://{self.DB_USER}:{self.DB_PASSWORD}"
             f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
