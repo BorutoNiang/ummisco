@@ -1,6 +1,6 @@
 /* ── api.js — Client HTTP vers le backend FastAPI ───────────── */
 
-const API_BASE = 'http://localhost:8000/api/v1';
+const API_BASE = 'https://ummisco-production.up.railway.app/api/v1';
 
 // ── Tokens ───────────────────────────────────────────────────
 

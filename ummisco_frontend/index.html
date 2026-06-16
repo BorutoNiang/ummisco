@@ -4,15 +4,32 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>UMMISCO | Unité internationale en modélisation et simulation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="css/global.css"/>
   <style>
-    /* ─── NAV ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      margin: 0;
+      background: #f8f9ff;
+      color: #0b1c30;
+    }
+
+    a { text-decoration: none; }
+
+    /* ─────────────────────────────────────────────────────
+       NAV
+    ───────────────────────────────────────────────────── */
     .site-nav {
       position: sticky; top: 0; z-index: 100;
       background: #fff;
-      border-bottom: 1px solid #e8e8e8;
+      border-bottom: 1px solid #c0c7d2;
       height: 80px;
       display: flex; align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,.05);
     }
     .nav-wrap {
       width: 100%; max-width: 1280px; margin: 0 auto;
@@ -25,31 +42,33 @@
     }
     .nav-logo-mark {
       width: 58px; height: 58px; border-radius: 50%;
-      border: 1.5px solid #d0d8e4;
+      border: 1.5px solid #c0c7d2;
       display: flex; align-items: center; justify-content: center;
       background: #fff;
     }
     .nav-logo-name {
+      font-family: 'Montserrat', sans-serif;
       font-size: 13px; font-weight: 700; letter-spacing: .08em;
-      color: #1a1a1a; text-transform: uppercase;
+      color: #0b1c30; text-transform: uppercase;
     }
     .nav-menu {
       display: flex; align-items: center; list-style: none;
-      gap: 4px; flex: 1;
+      gap: 4px; flex: 1; margin: 0; padding: 0;
     }
     .nav-menu li { position: relative; }
     .nav-menu li a,
     .nav-menu li > span {
       display: flex; align-items: center; gap: 5px;
       padding: 8px 14px;
-      font-size: 13.5px; font-weight: 700; letter-spacing: .04em;
-      text-transform: uppercase; color: #333;
-      cursor: pointer; border-radius: 6px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px; font-weight: 700; letter-spacing: .04em;
+      text-transform: uppercase; color: #414750;
+      cursor: pointer; border-radius: 8px;
       transition: color .15s, background .15s;
       white-space: nowrap;
     }
     .nav-menu li a:hover,
-    .nav-menu li > span:hover { color: #1a6faf; background: #f0f6ff; }
+    .nav-menu li > span:hover { color: #00568d; background: #eff4ff; }
     .nav-chevron { font-size: 8px; opacity: .55; transition: transform .15s; }
     .nav-menu li:hover .nav-chevron { transform: rotate(180deg); }
 
@@ -57,47 +76,73 @@
     .nav-sub {
       position: absolute; top: calc(100% + 6px); left: 0;
       min-width: 300px; background: #fff;
-      border: 1px solid #e8e8e8; border-radius: 10px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.1);
-      list-style: none; padding: 6px 0;
+      border: 1px solid #c0c7d2; border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      list-style: none; padding: 6px 0; margin: 0;
       opacity: 0; pointer-events: none;
       transform: translateY(-6px);
       transition: opacity .15s, transform .15s; z-index: 200;
     }
     .nav-menu li:hover .nav-sub { opacity: 1; pointer-events: all; transform: none; }
-    .nav-sub a:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12) !important; transform: translateY(-2px) !important; }
+    .nav-sub a:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08) !important; transform: translateY(-2px) !important; }
+
     /* Mega menu thèmes */
-    .nav-mega { position:absolute; top:calc(100% + 8px); left:-60px; width:700px; background:#fff; border:1px solid #e8e8e8; border-radius:12px; box-shadow:0 12px 40px rgba(0,0,0,.12); padding:20px; opacity:0; pointer-events:none; transform:translateY(-8px); transition:opacity .15s,transform .15s; z-index:300; display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-    .nav-menu li:hover .nav-mega { opacity:1; pointer-events:all; transform:none; }
-    .nav-theme-card { display:flex; flex-direction:column; border-radius:10px; overflow:hidden; border:1px solid #eee; text-decoration:none; transition:box-shadow .15s,transform .15s; background:#fff; }
-    .nav-theme-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.12); transform:translateY(-2px); }
-    .nav-theme-img { width:100%; height:120px; object-fit:cover; display:block; }
-    .nav-theme-name { padding:10px; font-size:11.5px; font-weight:700; color:#222; text-align:center; line-height:1.4; }    .nav-sub li a {
+    .nav-mega {
+      position: absolute; top: calc(100% + 8px); left: -60px;
+      width: 700px; background: #fff;
+      border: 1px solid #c0c7d2; border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      padding: 20px;
+      opacity: 0; pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity .15s, transform .15s;
+      z-index: 300;
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 12px;
+    }
+    .nav-menu li:hover .nav-mega { opacity: 1; pointer-events: all; transform: none; }
+    .nav-theme-card {
+      display: flex; flex-direction: column;
+      border-radius: 10px; overflow: hidden;
+      border: 1px solid #c0c7d2;
+      text-decoration: none;
+      transition: box-shadow .15s, transform .15s;
+      background: #fff;
+    }
+    .nav-theme-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-2px); }
+    .nav-theme-img { width: 100%; height: 120px; object-fit: cover; display: block; }
+    .nav-theme-name {
+      padding: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11.5px; font-weight: 700; color: #0b1c30;
+      text-align: center; line-height: 1.4;
+    }
+    .nav-sub li a {
       display: block; padding: 13px 20px;
+      font-family: 'Montserrat', sans-serif;
       font-size: 13px; font-weight: 700; letter-spacing: .04em;
-      text-transform: uppercase; color: #222; border-radius: 0;
+      text-transform: uppercase; color: #414750; border-radius: 0;
       background: none; line-height: 1.4; white-space: normal;
     }
-    .nav-sub li a:hover { background: #f0f6ff; color: #1a6faf; }
-    .nav-sub li + li { border-top: 1px solid #f2f2f2; }
+    .nav-sub li a:hover { background: #eff4ff; color: #00568d; }
+    .nav-sub li + li { border-top: 1px solid #eff4ff; }
 
     /* Lang switcher */
-    .nav-lang {
-      position: relative; flex-shrink: 0; margin-left: 24px;
-    }
+    .nav-lang { position: relative; flex-shrink: 0; margin-left: 24px; }
     .nav-lang-btn {
       display: flex; align-items: center; gap: 6px;
-      padding: 8px 16px; border: 1px solid #d0d8e4;
-      border-radius: 8px; font-size: 13px; font-weight: 600;
-      color: #333; cursor: pointer; background: #fff;
+      padding: 8px 16px; border: 1px solid #c0c7d2;
+      border-radius: 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px; font-weight: 600;
+      color: #414750; cursor: pointer; background: #fff;
       transition: border-color .15s;
     }
-    .nav-lang-btn:hover { border-color: #1a6faf; }
+    .nav-lang-btn:hover { border-color: #00568d; }
     .nav-lang-menu {
       position: absolute; top: calc(100% + 6px); right: 0;
-      background: #fff; border: 1px solid #e8e8e8;
-      border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,.1);
-      list-style: none; min-width: 80px;
+      background: #fff; border: 1px solid #c0c7d2;
+      border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      list-style: none; min-width: 80px; margin: 0; padding: 4px 0;
       opacity: 0; pointer-events: none;
       transform: translateY(-6px);
       transition: opacity .15s, transform .15s; z-index: 200;
@@ -105,191 +150,355 @@
     .nav-lang-menu.open { opacity: 1; pointer-events: all; transform: none; }
     .nav-lang-menu li a {
       display: block; padding: 9px 16px;
-      font-size: 13px; font-weight: 600; color: #444;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px; font-weight: 600; color: #414750;
       transition: background .12s;
     }
-    .nav-lang-menu li a:hover { background: #f0f6ff; color: #1a6faf; }
+    .nav-lang-menu li a:hover { background: #eff4ff; color: #00568d; }
 
-    /* ─── HERO ─────────────────────────────────────────── */
-    .hero {
-      max-width: 1100px; margin: 0 auto;
-      padding: 72px 40px 64px;
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 60px; align-items: center;
-      min-height: 0;
+    /* ─────────────────────────────────────────────────────
+       HERO
+    ───────────────────────────────────────────────────── */
+    .hero-section {
+      background: linear-gradient(160deg, #f8f9ff 0%, #eff4ff 100%);
+      padding: 80px 40px 72px;
     }
-    .hero > * { min-width: 0; }
-    @media(max-width:900px){ .hero { grid-template-columns:1fr; padding:48px 24px; } .hero-right { display:none; } }
-
+    .hero-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 72px; align-items: center;
+    }
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 40px; padding: 0; }
+      .hero-right { display: none; }
+      .hero-section { padding: 48px 24px; }
+    }
+    .hero-left { min-width: 0; }
     .hero-title {
       font-family: 'Montserrat', sans-serif;
-      font-size: clamp(1.9rem, 2.6vw, 2.8rem);
-      font-weight: 700; color: #111; line-height: 1.2;
-      margin-bottom: 20px;
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-weight: 800; color: #0b1c30; line-height: 1.15;
+      margin: 0 0 20px 0;
+      letter-spacing: -.02em;
     }
-    .hero-title strong em {
-      font-style: italic; font-weight: 800; color: #437cba;
+    .hero-title em {
+      font-style: italic; color: #00568d;
     }
-    .hero-desc {
-      font-size: 15.5px; color: #444; line-height: 1.85;
-      text-align: justify; margin-bottom: 32px;
+    .hero-subtitle {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 18px; color: #414750; line-height: 1.75;
+      margin: 0 0 40px 0;
     }
-    .hero-badges { display: flex; gap: 12px; flex-wrap: wrap; }
-    .hero-badge {
-      display: flex; align-items: center; gap: 10px;
-      padding: 11px 16px;
-      border: 1px solid #e0e8f0; border-radius: 10px;
-      font-size: 13px; font-weight: 500; color: #444;
-      line-height: 1.4; background: #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    .hero-pills {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      margin-bottom: 40px;
     }
-    .hero-badge-icon {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: #eef4fb;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+    .hero-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 18px;
+      background: #fff;
+      border: 1px solid #c0c7d2;
+      border-radius: 999px;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 14px; font-weight: 600; color: #0b1c30;
+      box-shadow: 0 2px 4px rgba(0,0,0,.05);
     }
-
-    /* Image droite — grande image unique arrondie */
+    .hero-pill-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #396756; flex-shrink: 0;
+    }
+    .hero-ctas {
+      display: flex; flex-wrap: wrap; gap: 14px;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px;
+      background: #00568d; color: #fff;
+      border: none; border-radius: 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px; font-weight: 700; letter-spacing: .03em;
+      cursor: pointer; text-decoration: none;
+      transition: background .15s, box-shadow .15s;
+      box-shadow: 0 4px 16px rgba(0,86,141,.25);
+    }
+    .btn-primary:hover { background: #1a6faf; box-shadow: 0 4px 20px rgba(0,86,141,.35); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px;
+      background: transparent; color: #00568d;
+      border: 1.5px solid #00568d; border-radius: 8px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px; font-weight: 700; letter-spacing: .03em;
+      cursor: pointer; text-decoration: none;
+      transition: background .15s, color .15s;
+    }
+    .btn-ghost:hover { background: #00568d; color: #fff; }
     .hero-right {
-      border-radius: 18px; overflow: hidden;
-      width: 100%; height: 320px;
-      box-shadow: 0 12px 40px rgba(0,0,0,.15);
+      border-radius: 14px; overflow: hidden;
+      width: 100%; aspect-ratio: 4/3;
+      box-shadow: 0 4px 20px rgba(0,0,0,.12);
     }
-    .hero-right-img {
+    .hero-right img {
       width: 100%; height: 100%; object-fit: cover; display: block;
     }
 
-    /* ─── SECTIONS ──────────────────────────────────────── */
+    /* ─────────────────────────────────────────────────────
+       SHARED SECTION LAYOUT
+    ───────────────────────────────────────────────────── */
     .page-section {
       padding: 88px 40px;
-      border-top: 1px solid #efefef;
     }
-    @media(max-width:768px){ .page-section { padding: 56px 20px; } }
-    .section-inner { max-width: 1100px; margin: 0 auto; }
+    @media (max-width: 768px) { .page-section { padding: 56px 20px; } }
+    .section-inner { max-width: 1280px; margin: 0 auto; }
 
-    .section-title-main {
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-title {
       font-family: 'Montserrat', sans-serif;
-      font-size: clamp(2rem, 3vw, 2.6rem);
-      font-weight: 700; text-align: center;
-      color: #1a4a3a; margin-bottom: 0;
-      letter-spacing: -.01em;
+      font-size: clamp(1.6rem, 2.5vw, 2rem);
+      font-weight: 700; color: #0b1c30;
+      margin: 0 0 12px 0; letter-spacing: -.01em;
     }
     .section-subtitle {
-      text-align: center; color: #777;
-      font-size: 14px; margin-top: 10px; margin-bottom: 52px;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 16px; color: #717881;
+      margin: 0; line-height: 1.6;
     }
-    .section-title-main + .themes-grid,
-    .section-title-main + .centres-grid { margin-top: 48px; }
 
-    /* ─── THÈMES ─────────────────────────────────────────── */
+    /* ─────────────────────────────────────────────────────
+       THEMES SECTION
+    ───────────────────────────────────────────────────── */
+    .section-themes { background: #fff; }
+
     .themes-grid {
       display: grid; grid-template-columns: repeat(4,1fr); gap: 24px;
-      margin-top: 48px;
     }
-    @media(max-width:1024px){ .themes-grid { grid-template-columns:repeat(2,1fr); } }
-    @media(max-width:540px){ .themes-grid { grid-template-columns:1fr; } }
+    @media (max-width: 1024px) { .themes-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 540px)  { .themes-grid { grid-template-columns: 1fr; } }
 
     .theme-card {
       text-decoration: none; display: flex; flex-direction: column;
-      gap: 16px; cursor: pointer;
+      background: #fff; border: 1px solid #c0c7d2;
+      border-radius: 14px; overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow .25s, transform .25s;
+    }
+    .theme-card:hover {
+      box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      transform: translateY(-2px);
     }
     .theme-card-img {
-      width: 100%; aspect-ratio: 1/1;
-      border-radius: 14px; overflow: hidden;
-      background: #eef4fb;
-      transition: box-shadow .25s;
-    }
-    .theme-card:hover .theme-card-img {
-      box-shadow: 0 8px 28px rgba(0,0,0,.15);
+      width: 100%; aspect-ratio: 4/3;
+      background: #eff4ff; overflow: hidden;
     }
     .theme-card-img img {
       width: 100%; height: 100%; object-fit: cover; display: block;
       transition: transform .35s ease;
     }
-    .theme-card:hover .theme-card-img img { transform: scale(1.05); }
-    .theme-card-ph {
-      width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
-      transition: transform .35s ease;
-    }
-    .theme-card:hover .theme-card-ph { transform: scale(1.03); }
+    .theme-card:hover .theme-card-img img { transform: scale(1.04); }
     .theme-card-name {
-      font-size: 13.5px; font-weight: 500; color: #222;
-      text-align: center; line-height: 1.5; padding: 0 4px;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 14px; font-weight: 600; color: #0b1c30;
+      text-align: center; line-height: 1.5;
+      padding: 16px 16px 20px;
     }
 
-    /* ─── CENTRES ────────────────────────────────────────── */
+    /* skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, #eff4ff 25%, #dce8f5 50%, #eff4ff 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 14px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ─────────────────────────────────────────────────────
+       CENTRES SECTION
+    ───────────────────────────────────────────────────── */
+    .section-centres { background: #eff4ff; }
+
     .centres-grid {
       display: flex; justify-content: center;
-      gap: 18px; flex-wrap: wrap;
-      margin-top: 48px;
+      gap: 20px; flex-wrap: wrap;
     }
     .centre-card {
       display: flex; flex-direction: column; align-items: center; gap: 14px;
-      padding: 28px 22px;
-      border: 1px solid #d0d0d0; border-radius: 22px;
-      min-width: 130px; max-width: 170px;
-      text-align: center; font-size: 13px; font-weight: 500;
-      color: #222; line-height: 1.45; text-decoration: none;
-      transition: border-color .2s, box-shadow .2s, transform .2s;
+      padding: 24px 20px;
       background: #fff;
+      border: 1px solid #c0c7d2; border-radius: 14px;
+      min-width: 140px; max-width: 180px;
+      text-align: center;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 14px; font-weight: 600; color: #0b1c30;
+      line-height: 1.45; text-decoration: none;
+      transition: border-color .2s, box-shadow .2s, transform .2s;
     }
     .centre-card:hover {
-      border-color: #7ebd6c; border-width: 2px;
-      box-shadow: 0 6px 20px rgba(0,0,0,.1);
+      border-color: #396756; border-width: 2px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.08);
       transform: translateY(-3px);
     }
     .centre-thumb {
-      width: 100%; height: 80px; border-radius: 10px;
+      width: 100%; height: 80px; border-radius: 8px;
       object-fit: cover; display: block;
     }
 
-    /* ─── TUTELLES ───────────────────────────────────────── */
+    /* ─────────────────────────────────────────────────────
+       STATS BAND
+    ───────────────────────────────────────────────────── */
+    .section-stats { background: #fff; }
+
+    .chiffres-band {
+      display: flex; align-items: stretch;
+      background: #0b1c30;
+      border-radius: 14px; overflow: hidden;
+      max-width: 900px; margin: 0 auto;
+      box-shadow: 0 4px 20px rgba(11,28,48,.2);
+    }
+    .chiffre-col {
+      flex: 1; padding: 56px 24px; text-align: center; color: #fff;
+    }
+    .chiffre-val {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(2.4rem, 4vw, 3.4rem);
+      font-weight: 700; line-height: 1; margin-bottom: 10px;
+      color: #fff;
+    }
+    .chiffre-lbl {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 14px; color: rgba(255,255,255,.7);
+      font-weight: 400; letter-spacing: .02em;
+    }
+    .chiffre-sep {
+      width: 1px; background: rgba(255,255,255,.15);
+      margin: 28px 0; flex-shrink: 0;
+    }
+
+    /* ─────────────────────────────────────────────────────
+       TUTELLES
+    ───────────────────────────────────────────────────── */
+    .section-tutelles { background: #fff; border-top: 1px solid #c0c7d2; }
+
     .tutelles-row {
       display: flex; flex-wrap: wrap; gap: 48px;
       align-items: center; justify-content: center;
-      margin-top: 52px;
     }
     .tutelle-item {
       display: flex; align-items: center; justify-content: center;
       opacity: .75; transition: opacity .2s, transform .2s;
     }
     .tutelle-item:hover { opacity: 1; transform: translateY(-2px); }
-    .tutelle-item img { height: 60px; width: auto; max-width: 130px; object-fit: contain; }
-    .tutelle-text { font-size: 13.5px; font-weight: 700; color: #444; text-align: center; line-height: 1.4; }
-
-    /* ─── CHIFFRES ───────────────────────────────────────── */
-    .chiffres-band {
-      display: flex; align-items: stretch;
-      background: linear-gradient(135deg, #4a7fc1 0%, #6baad4 100%);
-      border-radius: 20px; overflow: hidden;
-      max-width: 860px; margin: 48px auto 0;
-      box-shadow: 0 8px 32px rgba(74,127,193,.35);
+    .tutelle-item img {
+      height: 60px; width: auto; max-width: 140px; object-fit: contain;
     }
-    .chiffre-col { flex: 1; padding: 48px 20px; text-align: center; color: #fff; }
-    .chiffre-val {
-      font-family: 'Montserrat', sans-serif;
-      font-size: clamp(2.4rem, 4vw, 3.4rem);
-      font-weight: 700; line-height: 1; margin-bottom: 10px;
-    }
-    .chiffre-lbl { font-size: 13px; color: rgba(255,255,255,.85); font-weight: 400; letter-spacing: .02em; }
-    .chiffre-sep { width: 1px; background: rgba(255,255,255,.2); margin: 32px 0; flex-shrink: 0; }
 
-    /* ─── FOOTER ─────────────────────────────────────────── */
+    /* ─────────────────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────────────────── */
     .site-footer {
-      border-top: 1px solid #efefef;
-      padding: 24px 40px;
-      display: flex; align-items: center; justify-content: space-between;
-      font-size: 13px; color: #999; margin-top: 0;
+      background: #213145;
+      padding: 48px 40px 32px;
     }
-    .site-footer a { color: #333; font-weight: 600; text-decoration: none; transition: color .15s; }
-    .site-footer a:hover { color: #1a6faf; }
+    .footer-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+    }
+    @media (max-width: 900px) {
+      .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+    }
+    @media (max-width: 560px) {
+      .footer-inner { grid-template-columns: 1fr; }
+    }
+    .footer-brand { display: flex; flex-direction: column; gap: 16px; }
+    .footer-logo-wrap {
+      display: flex; align-items: center; gap: 12px; text-decoration: none;
+    }
+    .footer-logo-mark {
+      width: 48px; height: 48px; border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,.08);
+    }
+    .footer-logo-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px; font-weight: 700; letter-spacing: .08em;
+      color: #fff; text-transform: uppercase;
+    }
+    .footer-tagline {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 14px; color: rgba(255,255,255,.6);
+      line-height: 1.65; margin: 0;
+    }
+    .footer-col-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: rgba(255,255,255,.45);
+      margin: 0 0 16px 0;
+    }
+    .footer-links {
+      list-style: none; margin: 0; padding: 0;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .footer-links li a {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 14px; color: rgba(255,255,255,.75);
+      text-decoration: none; transition: color .15s;
+    }
+    .footer-links li a:hover { color: #fff; }
+    .footer-bottom {
+      max-width: 1280px; margin: 36px auto 0;
+      padding-top: 24px; border-top: 1px solid rgba(255,255,255,.12);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 13px; color: rgba(255,255,255,.45);
+    }
+    .footer-contact {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 13px; color: rgba(255,255,255,.6);
+      text-decoration: none; font-weight: 600;
+      transition: color .15s;
+    }
+    .footer-contact:hover { color: #fff; }
+
+    /* ─────────────────────────────────────────────────────
+       CHAT WIDGET
+    ───────────────────────────────────────────────────── */
+    .chat-msg-bot  { display: flex; justify-content: flex-start; }
+    .chat-msg-user { display: flex; justify-content: flex-end; }
+    .chat-bubble-bot  {
+      background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 12px 12px 12px 2px;
+      padding: 10px 14px; font-size: 13px; color: #1e293b;
+      line-height: 1.6; max-width: 85%;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    }
+    .chat-bubble-user {
+      background: #00568d; color: #fff;
+      border-radius: 12px 12px 2px 12px;
+      padding: 10px 14px; font-size: 13px;
+      line-height: 1.6; max-width: 85%;
+    }
+    .chat-typing { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+    .chat-typing span {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #94a3b8; animation: typing .9s infinite;
+    }
+    .chat-typing span:nth-child(2) { animation-delay: .2s; }
+    .chat-typing span:nth-child(3) { animation-delay: .4s; }
+    @keyframes typing {
+      0%,80%,100% { transform: scale(1); opacity: .4; }
+      40%          { transform: scale(1.3); opacity: 1; }
+    }
   </style>
 </head>
-<body style="font-family:'Montserrat',sans-serif;margin:0;background:#fff;color:#222;">
+<body>
 
-<!-- ═══ NAVBAR ═══ -->
+<!-- ═══════════════════════════════════════════════════════
+     NAVBAR
+═══════════════════════════════════════════════════════ -->
 <nav class="site-nav">
   <div class="nav-wrap">
     <!-- Logo -->
@@ -300,7 +509,7 @@
       <span class="nav-logo-name">UMMISCO</span>
     </a>
 
-    <!-- Liens -->
+    <!-- Menu -->
     <ul class="nav-menu">
       <li>
         <span>Thèmes <span class="nav-chevron">▾</span></span>
@@ -341,7 +550,7 @@
     </ul>
 
     <!-- Intranet -->
-    <a href="pages/login.html" style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:transparent;color:#1a6faf;border:1.5px solid #1a6faf;border-radius:8px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;flex-shrink:0;margin-left:12px;transition:all .15s" onmouseover="this.style.background='#1a6faf';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#1a6faf'">
+    <a href="pages/login.html" style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:transparent;color:#00568d;border:1.5px solid #00568d;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;flex-shrink:0;margin-left:12px;transition:all .15s" onmouseover="this.style.background='#00568d';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#00568d'">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       Intranet
     </a>
@@ -359,77 +568,150 @@
   </div>
 </nav>
 
-<!-- ═══ HERO ═══ -->
-<div class="hero">
-  <!-- Gauche : texte -->
-  <div>
-    <h1 class="hero-title">
-      Une unité au cœur<br>
-      <strong><em>des sciences de la complexité</em></strong>
-    </h1>
-    <p class="hero-desc">
-      Créée en 2009, l'UMI UMMISCO (UMI 209) est une unité mixte internationale
-      à vocation méthodologique, spécialisée dans la modélisation mathématique
-      et informatique des systèmes complexes au service de la science de la durabilité.
-      Implantée des approches innovantes de simulation, d'analyse et d'aide
-      à la décision appliquées aux systèmes naturels, biologiques et sociaux.
-    </p>
-  </div>
+<!-- ═══════════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════════ -->
+<section class="hero-section">
+  <div class="hero-inner">
+    <!-- Left: text -->
+    <div class="hero-left">
+      <h1 class="hero-title">
+        Une unité au cœur<br>
+        <em>des sciences de la complexité</em>
+      </h1>
+      <p class="hero-subtitle">
+        Unité Mixte Internationale spécialisée dans la modélisation mathématique
+        et informatique des systèmes complexes, au service de la durabilité.
+        Implantée dans cinq centres régionaux à travers le monde.
+      </p>
 
-  <!-- Droite : grande image watercolor officielle -->
-  <div class="hero-right">
-    <img src="images/hero-watercolor.webp" alt="UMMISCO sciences de la complexité" class="hero-right-img"/>
-  </div>
-</div>
+      <!-- Stat pills -->
+      <div class="hero-pills">
+        <span class="hero-pill">
+          <span class="hero-pill-dot"></span>
+          International
+        </span>
+        <span class="hero-pill">
+          <span class="hero-pill-dot"></span>
+          94 Membres
+        </span>
+        <span class="hero-pill">
+          <span class="hero-pill-dot"></span>
+          5 Continents
+        </span>
+      </div>
 
-<!-- ═══ THÈMES ═══ -->
-<section class="page-section" id="themes">
-  <div class="section-inner">
-    <h2 class="section-title-main">Thèmes</h2>
-    <div class="themes-grid" id="themes-grid">
-      <div class="skeleton" style="height:300px;border-radius:16px"></div>
-      <div class="skeleton" style="height:300px;border-radius:16px"></div>
-      <div class="skeleton" style="height:300px;border-radius:16px"></div>
-      <div class="skeleton" style="height:300px;border-radius:16px"></div>
+      <!-- CTAs -->
+      <div class="hero-ctas">
+        <a href="pages/presentation.html" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 8 16 12 12 16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Découvrir l'unité
+        </a>
+        <a href="pages/actualites.html" class="btn-ghost">Actualités</a>
+      </div>
+    </div>
+
+    <!-- Right: image -->
+    <div class="hero-right">
+      <img src="images/page daccueil.jpg" alt="UMMISCO sciences de la complexité"/>
     </div>
   </div>
 </section>
 
-<!-- ═══ CENTRES ═══ -->
-<section class="page-section" id="centres">
+<!-- ═══════════════════════════════════════════════════════
+     THÈMES
+═══════════════════════════════════════════════════════ -->
+<section class="page-section section-themes" id="themes">
   <div class="section-inner">
-    <h2 class="section-title-main">Centres</h2>
-    <p class="section-subtitle">Les activités de d'UMMISCO sont déployées au sein de cinq centres régionaux.</p>
+    <div class="section-header">
+      <h2 class="section-title">Axes Thématiques</h2>
+      <p class="section-subtitle">Nos quatre domaines de recherche structurants, au cœur des sciences de la complexité.</p>
+    </div>
+    <div class="themes-grid" id="themes-grid">
+      <div class="skeleton" style="height:260px"></div>
+      <div class="skeleton" style="height:260px"></div>
+      <div class="skeleton" style="height:260px"></div>
+      <div class="skeleton" style="height:260px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     CENTRES
+═══════════════════════════════════════════════════════ -->
+<section class="page-section section-centres" id="centres">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 class="section-title">Nos Centres</h2>
+      <p class="section-subtitle">Les activités d'UMMISCO sont déployées au sein de cinq centres régionaux à travers le monde.</p>
+    </div>
     <div class="centres-grid">
       <a class="centre-card" href="pages/partenaires.html">
-        <img src="images/centre-afrique-ouest.webp"    alt="Afrique de l'Ouest" class="centre-thumb"/>
+        <img src="images/centre-afrique-ouest.webp" alt="Afrique de l'Ouest" class="centre-thumb"/>
         <span>Centre Afrique<br>de l'Ouest</span>
       </a>
       <a class="centre-card" href="pages/partenaires.html">
-        <img src="images/centre-afrique-centrale.webp" alt="Afrique centrale"   class="centre-thumb"/>
+        <img src="images/centre-afrique-centrale.webp" alt="Afrique centrale" class="centre-thumb"/>
         <span>Centre Afrique<br>centrale et de l'est</span>
       </a>
       <a class="centre-card" href="pages/partenaires.html">
-        <img src="images/centre-mediterranee.webp"     alt="Méditerranée"       class="centre-thumb"/>
+        <img src="images/centre-mediterranee.webp" alt="Méditerranée" class="centre-thumb"/>
         <span>Centre<br>Méditerranée</span>
       </a>
       <a class="centre-card" href="pages/partenaires.html">
-        <img src="images/centre-france.webp"           alt="France"             class="centre-thumb"/>
+        <img src="images/centre-france.webp" alt="France" class="centre-thumb"/>
         <span>Centre<br>France</span>
       </a>
       <a class="centre-card" href="pages/partenaires.html">
-        <img src="images/centre-asie.webp"             alt="Asie du Sud-Est"    class="centre-thumb"/>
+        <img src="images/centre-asie.webp" alt="Asie du Sud-Est" class="centre-thumb"/>
         <span>Centre Asie<br>du Sud-Est</span>
       </a>
     </div>
   </div>
 </section>
 
-<!-- ═══ TUTELLES ═══ -->
-<section class="page-section">
+<!-- ═══════════════════════════════════════════════════════
+     STATS BAND
+═══════════════════════════════════════════════════════ -->
+<section class="page-section section-stats">
   <div class="section-inner">
-    <h2 class="section-title-main">Tutelles</h2>
-    <div class="tutelles-row" style="margin-top:40px">
+    <div class="section-header">
+      <h2 class="section-title">UMMISCO en quelques chiffres</h2>
+    </div>
+    <div class="chiffres-band">
+      <div class="chiffre-col">
+        <div class="chiffre-val" data-target="1972" data-prefix="+">0</div>
+        <div class="chiffre-lbl">Publications</div>
+      </div>
+      <div class="chiffre-sep"></div>
+      <div class="chiffre-col">
+        <div class="chiffre-val" data-target="27">0</div>
+        <div class="chiffre-lbl">Partenaires</div>
+      </div>
+      <div class="chiffre-sep"></div>
+      <div class="chiffre-col">
+        <div class="chiffre-val" data-target="29">0</div>
+        <div class="chiffre-lbl">Projets</div>
+      </div>
+      <div class="chiffre-sep"></div>
+      <div class="chiffre-col">
+        <div class="chiffre-val" data-target="94">0</div>
+        <div class="chiffre-lbl">Membres</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     TUTELLES ET PARTENAIRES
+═══════════════════════════════════════════════════════ -->
+<section class="page-section section-tutelles">
+  <div class="section-inner">
+    <div class="section-header">
+      <h2 class="section-title">Tutelles et Partenaires</h2>
+      <p class="section-subtitle">Les établissements qui soutiennent et accueillent nos activités de recherche.</p>
+    </div>
+    <div class="tutelles-row">
       <a href="https://www.ird.fr" target="_blank" class="tutelle-item">
         <img src="images/ird.png" alt="IRD"/>
       </a>
@@ -455,43 +737,114 @@
   </div>
 </section>
 
-<!-- ═══ CHIFFRES ═══ -->
-<section class="page-section">
-  <div class="section-inner">
-    <h2 class="section-title-main">UMMISCO en quelques chiffres</h2>
-    <div class="chiffres-band" style="margin-top:40px">
-      <div class="chiffre-col">
-        <div class="chiffre-val" data-target="1972" data-prefix="+">0</div>
-        <div class="chiffre-lbl">Publications</div>
-      </div>
-      <div class="chiffre-sep"></div>
-      <div class="chiffre-col">
-        <div class="chiffre-val" data-target="27">0</div>
-        <div class="chiffre-lbl">Partenaires</div>
-      </div>
-      <div class="chiffre-sep"></div>
-      <div class="chiffre-col">
-        <div class="chiffre-val" data-target="29">0</div>
-        <div class="chiffre-lbl">Projets</div>
-      </div>
-      <div class="chiffre-sep"></div>
-      <div class="chiffre-col">
-        <div class="chiffre-val" data-target="94">0</div>
-        <div class="chiffre-lbl">Membres</div>
-      </div>
+<!-- ═══════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <!-- Brand -->
+    <div class="footer-brand">
+      <a href="index.html" class="footer-logo-wrap">
+        <div class="footer-logo-mark">
+          <img src="images/logo-ummisco-officiel.webp" alt="UMMISCO" style="width:34px;height:34px;object-fit:contain;border-radius:50%"/>
+        </div>
+        <span class="footer-logo-name">UMMISCO</span>
+      </a>
+      <p class="footer-tagline">
+        Unité Mixte Internationale dédiée à la modélisation et simulation des systèmes complexes depuis 2009.
+      </p>
+    </div>
+
+    <!-- Recherche -->
+    <div>
+      <p class="footer-col-title">Recherche</p>
+      <ul class="footer-links">
+        <li><a href="pages/axes.html">Axes thématiques</a></li>
+        <li><a href="pages/projets.html">Projets</a></li>
+        <li><a href="pages/publications.html">Publications</a></li>
+        <li><a href="pages/datasets.html">Datasets</a></li>
+        <li><a href="pages/integrations.html">Logiciels</a></li>
+      </ul>
+    </div>
+
+    <!-- Communauté -->
+    <div>
+      <p class="footer-col-title">Communauté</p>
+      <ul class="footer-links">
+        <li><a href="pages/equipe.html">Membres</a></li>
+        <li><a href="pages/partenaires.html">Centres</a></li>
+        <li><a href="pages/partenaires.html">Partenaires</a></li>
+        <li><a href="pages/actualites.html">Actualités</a></li>
+      </ul>
+    </div>
+
+    <!-- Info -->
+    <div>
+      <p class="footer-col-title">Informations</p>
+      <ul class="footer-links">
+        <li><a href="pages/presentation.html">Présentation</a></li>
+        <li><a href="pages/contact.html">Contact</a></li>
+        <li><a href="pages/login.html">Intranet</a></li>
+      </ul>
     </div>
   </div>
-</section>
 
-<!-- ═══ FOOTER ═══ -->
-<footer class="site-footer">
-  <span>© 2026 UMMISCO &nbsp;·&nbsp; Tous droits réservés</span>
-  <a href="pages/contact.html">Contact</a>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 UMMISCO · Tous droits réservés</span>
+    <a href="pages/contact.html" class="footer-contact">Contact</a>
+  </div>
 </footer>
 
-<!-- Montserrat font -->
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,700&display=swap" rel="stylesheet"/>
+<!-- ═══════════════════════════════════════════════════════
+     CHAT WIDGET
+═══════════════════════════════════════════════════════ -->
+<div id="chat-widget" style="position:fixed;bottom:24px;right:24px;z-index:9999;font-family:'Source Sans 3',sans-serif">
+
+  <!-- Toggle button -->
+  <button id="chat-toggle" onclick="toggleChat()" style="width:56px;height:56px;border-radius:50%;background:#00568d;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,86,141,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s" title="Assistant UMMISCO">
+    <svg id="chat-icon-open" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <svg id="chat-icon-close" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+
+  <!-- Chat window -->
+  <div id="chat-window" style="display:none;flex-direction:column;width:360px;height:500px;background:#fff;border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.18);margin-bottom:12px;overflow:hidden;border:1px solid #c0c7d2">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#003f87,#00568d);padding:16px 20px;display:flex;align-items:center;gap:12px">
+      <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">
+        <img src="images/logo-ummisco-officiel.webp" alt="UMMISCO" style="width:32px;height:32px;object-fit:contain;border-radius:50%"/>
+      </div>
+      <div>
+        <div style="color:#fff;font-weight:700;font-size:14px;font-family:'Montserrat',sans-serif">Assistant UMMISCO</div>
+        <div style="color:rgba(255,255,255,.7);font-size:11px;display:flex;align-items:center;gap:5px">
+          <span style="width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block"></span>
+          Propulsé par Groq · Llama 3.3
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="chat-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#f8fafc">
+      <div class="chat-msg-bot">
+        <div class="chat-bubble-bot">👋 Bonjour ! Je suis l'assistant UMMISCO. Comment puis-je vous aider ? Vous pouvez me poser des questions sur nos thèmes de recherche, nos membres, nos projets ou nos centres.</div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div style="padding:12px 16px;border-top:1px solid #c0c7d2;background:#fff;display:flex;gap:8px">
+      <input id="chat-input" type="text" placeholder="Posez votre question…"
+             style="flex:1;padding:10px 14px;border:1px solid #c0c7d2;border-radius:24px;font-size:13px;font-family:'Source Sans 3',sans-serif;outline:none;transition:border-color .15s"
+             onfocus="this.style.borderColor='#00568d'"
+             onblur="this.style.borderColor='#c0c7d2'"
+             onkeydown="if(event.key==='Enter')sendMessage()"/>
+      <button onclick="sendMessage()" id="chat-send"
+              style="width:40px;height:40px;border-radius:50%;background:#00568d;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s"
+              onmouseover="this.style.background='#1a6faf'" onmouseout="this.style.background='#00568d'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
 
 <script src="js/api.js"></script>
 <script>
@@ -503,24 +856,26 @@ document.addEventListener('click', e => {
   });
 });
 
-/* ── Thèmes ── */
-// Thèmes fixes — noms et images officiels du site ummisco.fr
 const THEMES_OFFICIELS = [
   {
     nom: "Modélisation mathématique et informatique à base d'agents",
-    img: 'images/theme-modelisation.webp',
+    // Simulation / réseau de neurones / calcul scientifique — photo réelle
+    img: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&q=80',
   },
   {
     nom: 'Intelligence Artificielle et Apprentissage Profond',
-    img: 'images/theme-ia.webp',
+    // Réseau neuronal / IA — photo réelle
+    img: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&q=80',
   },
   {
     nom: 'Capteurs et collecte de données',
-    img: 'images/theme-capteurs.webp',
+    // Terrain / capteurs environnementaux — photo réelle
+    img: 'https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=600&q=80',
   },
   {
     nom: 'Approches participatives et science citoyenne',
-    img: 'images/theme-participatif.webp',
+    // Communauté / travail collaboratif — photo réelle
+    img: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80',
   },
 ];
 
@@ -535,7 +890,6 @@ function loadThemes() {
     </a>`).join('');
 }
 
-/* ── Compteurs ── */
 function animateCounters() {
   document.querySelectorAll('.chiffre-val[data-target]').forEach(el => {
     const target = +el.dataset.target;
@@ -555,69 +909,8 @@ new IntersectionObserver(([e]) => { if (e.isIntersecting) { animateCounters(); }
 loadThemes();
 </script>
 
-<!-- ═══ CHAT UMMISCO IA ═══ -->
-<div id="chat-widget" style="position:fixed;bottom:24px;right:24px;z-index:9999;font-family:'Montserrat',sans-serif">
-
-  <!-- Bouton toggle -->
-  <button id="chat-toggle" onclick="toggleChat()" style="width:56px;height:56px;border-radius:50%;background:#1a6faf;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(26,111,175,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s" title="Assistant UMMISCO">
-    <svg id="chat-icon-open" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    <svg id="chat-icon-close" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-  </button>
-
-  <!-- Fenêtre chat -->
-  <div id="chat-window" style="display:none;flex-direction:column;width:360px;height:500px;background:#fff;border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.18);margin-bottom:12px;overflow:hidden;border:1px solid #e2e8f0">
-
-    <!-- Header -->
-    <div style="background:linear-gradient(135deg,#003f87,#1a6faf);padding:16px 20px;display:flex;align-items:center;gap:12px">
-      <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
-      </div>
-      <div>
-        <div style="color:#fff;font-weight:700;font-size:14px">Assistant UMMISCO</div>
-        <div style="color:rgba(255,255,255,.7);font-size:11px;display:flex;align-items:center;gap:5px">
-          <span style="width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block"></span>
-          Propulsé par Groq · Llama 3.3
-        </div>
-      </div>
-    </div>
-
-    <!-- Messages -->
-    <div id="chat-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#f8fafc">
-      <div class="chat-msg-bot">
-        <div class="chat-bubble-bot">👋 Bonjour ! Je suis l'assistant UMMISCO. Comment puis-je vous aider ? Vous pouvez me poser des questions sur nos thèmes de recherche, nos membres, nos projets ou nos centres.</div>
-      </div>
-    </div>
-
-    <!-- Input -->
-    <div style="padding:12px 16px;border-top:1px solid #e2e8f0;background:#fff;display:flex;gap:8px">
-      <input id="chat-input" type="text" placeholder="Posez votre question…"
-             style="flex:1;padding:10px 14px;border:1px solid #d1d5db;border-radius:24px;font-size:13px;font-family:'Montserrat',sans-serif;outline:none;transition:border-color .15s"
-             onfocus="this.style.borderColor='#1a6faf'"
-             onblur="this.style.borderColor='#d1d5db'"
-             onkeydown="if(event.key==='Enter')sendMessage()"/>
-      <button onclick="sendMessage()" id="chat-send"
-              style="width:40px;height:40px;border-radius:50%;background:#1a6faf;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s"
-              onmouseover="this.style.background='#155a8a'" onmouseout="this.style.background='#1a6faf'">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      </button>
-    </div>
-  </div>
-</div>
-
-<style>
-  .chat-msg-bot { display:flex; justify-content:flex-start; }
-  .chat-msg-user { display:flex; justify-content:flex-end; }
-  .chat-bubble-bot { background:#fff; border:1px solid #e2e8f0; border-radius:12px 12px 12px 2px; padding:10px 14px; font-size:13px; color:#1e293b; line-height:1.6; max-width:85%; box-shadow:0 1px 3px rgba(0,0,0,.06); }
-  .chat-bubble-user { background:#1a6faf; color:#fff; border-radius:12px 12px 2px 12px; padding:10px 14px; font-size:13px; line-height:1.6; max-width:85%; }
-  .chat-typing { display:flex; gap:4px; align-items:center; padding:4px 0; }
-  .chat-typing span { width:7px; height:7px; border-radius:50%; background:#94a3b8; animation:typing .9s infinite; }
-  .chat-typing span:nth-child(2) { animation-delay:.2s; }
-  .chat-typing span:nth-child(3) { animation-delay:.4s; }
-  @keyframes typing { 0%,80%,100%{transform:scale(1);opacity:.4} 40%{transform:scale(1.3);opacity:1} }
-</style>
-
 <script>
-const CHAT_API = 'http://localhost:8000/api/v1/chat';
+const CHAT_API = 'https://ummisco-production.up.railway.app/api/v1/chat';
 let chatHistory = [];
 let chatOpen = false;
 
