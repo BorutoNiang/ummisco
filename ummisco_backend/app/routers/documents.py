@@ -218,42 +218,101 @@ def generer_convention_stage(data: ConventionStageRequest, _=Depends(require_rol
         raise HTTPException(404, "Template introuvable")
 
     doc = Document(str(tpl))
+    paras = doc.paragraphs
 
-    # Remplacements dans tout le document
-    replacements = {
-        # Lignes à compléter après les deux-points
-        "NOM :": f"NOM : {data.nom_etablissement}",
-        "STATUT JURIDIQUE :": f"STATUT JURIDIQUE : {data.statut_juridique}",
-        "SIEGE :": f"SIEGE : {data.siege}",
-        "REPRESENTANT LEGAL :": f"REPRESENTANT LEGAL : {data.representant}",
-        "Nom et prénom(s) :": f"Nom et prénom(s) : {data.prenom_stagiaire} {data.nom_stagiaire}",
-        "Adresse :": f"Adresse : {data.adresse_stagiaire}",
-        "Tél :": f"Tél : {data.tel_stagiaire}",
-        "Email :": f"Email : {data.email_stagiaire}",
-        "Année universitaire :": f"Année universitaire : {data.annee_universitaire}",
-        "Diplôme préparé :": f"Diplôme préparé : {data.diplome}",
-        "Spécialité :": f"Spécialité : {data.specialite}",
-        "du :": f"du : {data.date_debut}",
-        "au :": f"au : {data.date_fin}",
-        "Lieu :": f"Lieu : {data.lieu_stage}",
-        "Structure d'accueil :": f"Structure d'accueil : {data.structure_accueil}",
-        "Encadrant(e) :": f"Encadrant(e) : {data.encadrant}",
-        "Mensuel :": f"Mensuel : {data.montant_mensuel}",
-        "Transport :": f"Transport : {data.transport}",
-        "Restauration :": f"Restauration : {data.restauration}",
-        "Imputation :": f"Imputation : {data.imputation}",
-    }
-    _fill_doc(doc, replacements)
+    def set_run(para, run_idx, value):
+        """Écrit la valeur dans un run précis du paragraphe."""
+        if value and run_idx < len(para.runs):
+            para.runs[run_idx].text = value
 
-    # Table signatures
+    def append_run(para, value):
+        """Ajoute la valeur dans le dernier run."""
+        if value and para.runs:
+            para.runs[-1].text = value
+
+    # ── Établissement ──────────────────────────────────────────
+    # P10: "Nom de l'organisme de formation\xa0:" + run1=" " → écrire dans run1
+    set_run(paras[10], 1, data.nom_etablissement)
+
+    # P11: run0="Statut juridique\xa0", run1=": " → ajouter après run1
+    if data.statut_juridique and len(paras[11].runs) >= 2:
+        paras[11].runs[1].text = ": " + data.statut_juridique
+
+    # P12: run0="Siège social\xa0: " (un seul run) → append
+    if data.siege and paras[12].runs:
+        paras[12].runs[0].text = paras[12].runs[0].text.rstrip() + " " + data.siege
+
+    # P13: "Représenté par\xa0:" + run1=" " → écrire dans run1
+    set_run(paras[13], 1, data.representant)
+
+    # ── Stagiaire ───────────────────────────────────────────────
+    # P17: "Nom, Prénom\xa0:" + run1=" " → écrire dans run1
+    set_run(paras[17], 1, f"{data.prenom_stagiaire} {data.nom_stagiaire}")
+
+    # P18: "Adresse\xa0:" + run1=" " → écrire dans run1
+    set_run(paras[18], 1, data.adresse_stagiaire)
+
+    # P19: run0="Tel\xa0: " (seul run) → append
+    if data.tel_stagiaire and paras[19].runs:
+        paras[19].runs[0].text = paras[19].runs[0].text.rstrip() + " " + data.tel_stagiaire
+
+    # P20: run0="Email\xa0: " (seul run) → append
+    if data.email_stagiaire and paras[20].runs:
+        paras[20].runs[0].text = paras[20].runs[0].text.rstrip() + " " + data.email_stagiaire
+
+    # P21: run0="Etudiant ", run1="pour l'année universitaire\xa0:", run2=" " → écrire dans run2
+    set_run(paras[21], 2, data.annee_universitaire)
+
+    # P22: run0="Diplôme préparé", run1=" ", run2=": " → ajouter après run2
+    if data.diplome and len(paras[22].runs) >= 3:
+        paras[22].runs[2].text = ": " + data.diplome
+
+    # P23: run0="Spécialité", run1=" ", run2=": " → ajouter après run2
+    if data.specialite and len(paras[23].runs) >= 3:
+        paras[23].runs[2].text = ": " + data.specialite
+
+    # ── Modalités ───────────────────────────────────────────────
+    # P57: run1="…………………" (date début), run3="…………………." (date fin)
+    if data.date_debut:
+        set_run(paras[57], 1, data.date_debut)
+    if data.date_fin:
+        set_run(paras[57], 3, data.date_fin + ".")
+
+    # P59: run2="……………………………." → lieu
+    set_run(paras[59], 2, data.lieu_stage + ".")
+
+    # P61: run1=" …………………………." → structure
+    if data.structure_accueil and len(paras[61].runs) >= 2:
+        paras[61].runs[1].text = " " + data.structure_accueil + "."
+
+    # P64: run1="…………………………….." → encadrant scientifique
+    set_run(paras[64], 1, data.encadrant + "..")
+
+    # P65: run2="………………………" → encadrant pédagogique
+    set_run(paras[65], 2, data.encadrant)
+
+    # ── Gratification ────────────────────────────────────────────
+    # P69: run1="……….." → montant mensuel
+    set_run(paras[69], 1, data.montant_mensuel or "")
+
+    # P70: run1=" …………….." → transport
+    if data.transport and len(paras[70].runs) >= 2:
+        paras[70].runs[1].text = " " + data.transport
+
+    # P71: run1="……………… " → restauration
+    if data.restauration and len(paras[71].runs) >= 2:
+        paras[71].runs[1].text = data.restauration + " "
+
+    # P73: run2="……………………………" → imputation
+    set_run(paras[73], 2, data.imputation or "")
+
+    # ── Signatures ──────────────────────────────────────────────
     if doc.tables:
-        sig_tbl = doc.tables[0]
-        if len(sig_tbl.rows) > 1:
-            row = sig_tbl.rows[1]
-            cells = row.cells
-            if len(cells) >= 3:
-                _set_para_text(cells[0].paragraphs[0], data.representant)
-                _set_para_text(cells[1].paragraphs[0], f"{data.prenom_stagiaire} {data.nom_stagiaire}")
+        cells = doc.tables[0].rows[1].cells
+        if cells[0].paragraphs:
+            cells[0].paragraphs[0].add_run(f"\n{data.representant}")
+        if cells[1].paragraphs:
+            cells[1].paragraphs[0].add_run(f"\n{data.prenom_stagiaire} {data.nom_stagiaire}")
 
     return _docx_response(doc, "convention-stage.docx")
 
