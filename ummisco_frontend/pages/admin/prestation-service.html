@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prestation de service — UMMISCO Admin</title>
+  <link rel="stylesheet" href="../../css/global.css"/>
+  <style>
+    .doc-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:900px){ .doc-grid{grid-template-columns:1fr;} }
+    .section-card { background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:20px; margin-bottom:16px; }
+    .section-title { font-size:13px; font-weight:700; color:#1e293b; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; gap:8px; }
+    .section-title svg { color:#003f87; }
+    .impot-info { background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:10px 14px; font-size:12px; color:#92400e; margin-top:8px; }
+    .spinner { width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:inline-block; }
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+
+<div class="section-card">
+  <div class="section-title">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Identité du prestataire
+  </div>
+  <div class="doc-grid gap-form">
+    <div class="form-group">
+      <label class="form-label">NOM</label>
+      <input class="form-input" id="ps-nom" type="text" placeholder="NOM (majuscules)"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Prénoms</label>
+      <input class="form-input" id="ps-prenoms" type="text" placeholder="Prénom(s)"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Né(e) le</label>
+      <input class="form-input" id="ps-ne-le" type="date"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">À (lieu de naissance)</label>
+      <input class="form-input" id="ps-a" type="text" placeholder="Ville de naissance"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Adresse</label>
+      <input class="form-input" id="ps-adresse" type="text" placeholder="Adresse complète"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Téléphone</label>
+      <input class="form-input" id="ps-tel" type="text" placeholder="Ex: 77 000 00 00"/>
+    </div>
+    <div class="form-group" style="grid-column:1/-1">
+      <label class="form-label">Emploi / Fonction</label>
+      <input class="form-input" id="ps-fonction" type="text" placeholder="Ex: Consultant, Développeur…"/>
+    </div>
+  </div>
+</div>
+
+<div class="section-card">
+  <div class="section-title">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Objet de la prestation
+  </div>
+  <div class="gap-form">
+    <div class="form-group">
+      <label class="form-label">Objet de la prestation</label>
+      <textarea class="form-input" id="ps-objet" rows="3" placeholder="Description de la prestation…"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Produits / livrables attendus</label>
+      <textarea class="form-input" id="ps-produits" rows="2" placeholder="Ex: Rapport, code source…"></textarea>
+    </div>
+    <div class="doc-grid">
+      <div class="form-group">
+        <label class="form-label">Date de début</label>
+        <input class="form-input" id="ps-debut" type="date"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date de fin</label>
+        <input class="form-input" id="ps-fin" type="date"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Responsable du suivi</label>
+      <input class="form-input" id="ps-responsable" type="text" placeholder="Nom du responsable"/>
+    </div>
+  </div>
+</div>
+
+<div class="section-card">
+  <div class="section-title">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    Rémunération
+  </div>
+  <div class="doc-grid gap-form">
+    <div class="form-group">
+      <label class="form-label">Montant net en chiffres (FCFA)</label>
+      <input class="form-input" id="ps-montant" type="number" placeholder="0" oninput="calcImpot()"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Montant net en lettres</label>
+      <input class="form-input" id="ps-montant-lettres" type="text" placeholder="Ex: Cinquante mille francs CFA"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">SERVICE / UR / US</label>
+      <input class="form-input" id="ps-service" type="text" placeholder="Ex: UMMISCO"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Imputation EOTP</label>
+      <input class="form-input" id="ps-imputation" type="text" placeholder="Code EOTP"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Date d'acquit</label>
+      <input class="form-input" id="ps-acquit" type="date"/>
+    </div>
+  </div>
+  <div class="impot-info" id="impot-info" style="display:none"></div>
+</div>
+
+<div style="display:flex;gap:10px">
+  <button class="btn btn--primary" id="ps-btn" onclick="genererPDF()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Générer PDF
+  </button>
+  <button class="btn btn--ghost" onclick="resetForm()">Réinitialiser</button>
+</div>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/admin-layout.js"></script>
+<script>
+initAdminLayout('prestation-service');
+
+function calcImpot() {
+  const montant = parseFloat(document.getElementById('ps-montant').value) || 0;
+  const info = document.getElementById('impot-info');
+  if (montant >= 25000) {
+    const impot = (montant * 0.05).toFixed(0);
+    const brut = (montant + parseFloat(impot)).toFixed(0);
+    info.style.display = 'block';
+    info.textContent = `Impôt 5% appliqué : ${Number(impot).toLocaleString('fr-FR')} FCFA — Montant brut : ${Number(brut).toLocaleString('fr-FR')} FCFA`;
+  } else {
+    info.style.display = 'none';
+  }
+}
+
+function getData() {
+  return {
+    nom:                  document.getElementById('ps-nom').value,
+    prenoms:              document.getElementById('ps-prenoms').value,
+    ne_le:                document.getElementById('ps-ne-le').value,
+    a:                    document.getElementById('ps-a').value,
+    adresse:              document.getElementById('ps-adresse').value,
+    tel:                  document.getElementById('ps-tel').value,
+    emploi_fonction:      document.getElementById('ps-fonction').value,
+    objet_prestation:     document.getElementById('ps-objet').value,
+    produits_attendus:    document.getElementById('ps-produits').value,
+    date_debut:           document.getElementById('ps-debut').value,
+    date_fin:             document.getElementById('ps-fin').value,
+    responsable_suivi:    document.getElementById('ps-responsable').value,
+    montant_net:          parseFloat(document.getElementById('ps-montant').value) || 0,
+    montant_net_lettres:  document.getElementById('ps-montant-lettres').value,
+    service_ur:           document.getElementById('ps-service').value,
+    imputation_eotp:      document.getElementById('ps-imputation').value,
+    date_acquit:          document.getElementById('ps-acquit').value,
+  };
+}
+
+async function genererPDF() {
+  const btn = document.getElementById('ps-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Génération…';
+  try {
+    await api.download('/documents/prestation-service/xlsx', getData(), 'prestation-service.xlsx');
+    Toast.success('PDF généré avec succès');
+  } catch(e) {
+    Toast.error('Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Générer PDF';
+  }
+}
+
+function resetForm() {
+  document.querySelectorAll('.form-input').forEach(el => el.value = '');
+  document.getElementById('impot-info').style.display = 'none';
+}
+
+// Préremplir date acquit
+setTimeout(() => {
+  const el = document.getElementById('ps-acquit');
+  if (el) el.value = new Date().toISOString().split('T')[0];
+}, 50);
+</script>
+</body>
+</html>

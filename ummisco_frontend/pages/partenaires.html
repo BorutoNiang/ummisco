@@ -6,55 +6,116 @@
   <title>Partenaires — UMMISCO</title>
   <link rel="stylesheet" href="../css/global.css"/>
   <style>
-    .partner-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 28px;
+    /* ── Section header ── */
+    .section-centre {
+      margin-bottom: 40px;
     }
-    @media(max-width:768px) { .partner-grid { grid-template-columns: repeat(2,1fr); } }
-    @media(max-width:480px) { .partner-grid { grid-template-columns: 1fr; } }
-
-    .partner-card {
-      background: #fff;
-      border: 1px solid var(--c-border);
-      border-radius: var(--radius-md);
-      padding: 28px 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 16px;
-      transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
-    }
-    .partner-card:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-3px);
-      border-color: var(--c-primary);
-    }
-    .partner-card-logo {
-      height: 80px;
-      width: auto;
-      max-width: 180px;
-      object-fit: contain;
-    }
-    .partner-card-name {
+    .section-centre-title {
+      font-size: 18px;
       font-weight: 700;
-      font-size: 1rem;
       color: var(--c-primary);
+      margin-bottom: 6px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--c-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .partner-card-desc {
-      font-size: 13px;
-      color: var(--c-text2);
-      line-height: 1.6;
-    }
-    .partner-card-type {
-      display: inline-block;
-      padding: 3px 12px;
-      border-radius: 100px;
+    .centre-badge {
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: .04em;
+      letter-spacing: .05em;
+      padding: 3px 10px;
+      border-radius: 100px;
+      background: var(--c-primary-l);
+      color: var(--c-primary);
+    }
+
+    /* ── Logo grids ── */
+    .logo-group-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--c-text3);
+      margin: 16px 0 10px;
+    }
+    .logos-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .logo-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      padding: 20px 18px;
+      width: 160px;
+      text-align: center;
+      transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+    }
+    .logo-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+      border-color: var(--c-primary);
+    }
+    .logo-card img {
+      width: 120px;
+      height: 64px;
+      object-fit: contain;
+      display: block;
+    }
+    .logo-card-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--c-text2);
+      line-height: 1.4;
+    }
+    .logo-placeholder {
+      width: 120px;
+      height: 64px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--c-text3);
+    }
+
+    /* ── Stats bar ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    @media (max-width: 640px) { .stats-row { grid-template-columns: 1fr 1fr; } }
+    .stat-box {
+      background: #fff;
+      border: 1px solid var(--c-border);
+      border-top: 3px solid var(--c-primary);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-box-num { font-size: 1.8rem; font-weight: 700; color: var(--c-primary); }
+    .stat-box-lbl { font-size: 12px; color: var(--c-text3); }
+
+    /* ── Filters ── */
+    .filters-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--c-border);
+      margin-bottom: 36px;
     }
   </style>
 </head>
@@ -63,100 +124,177 @@
 <div class="page-header-inst">
   <div class="container">
     <h1>Partenaires</h1>
-    <p>Nos partenaires académiques et institutionnels</p>
+    <p>Tutelles et partenaires des centres UMMISCO dans le monde</p>
   </div>
 </div>
 
 <div style="padding:48px 0 64px">
   <div class="container">
 
-    <div class="section-title" style="margin-bottom:32px">
-      <div class="section-title-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <!-- Stats -->
+    <div class="stats-row" id="stats-row">
+      <div class="stat-box">
+        <div class="stat-box-num" id="st-centres">—</div>
+        <div class="stat-box-lbl">Centres</div>
       </div>
-      <h2>Nos partenaires</h2>
-      <div class="section-title-bar"></div>
+      <div class="stat-box" style="border-top-color:#2563eb">
+        <div class="stat-box-num" style="color:#2563eb" id="st-tutelles">—</div>
+        <div class="stat-box-lbl">Tutelles</div>
+      </div>
+      <div class="stat-box" style="border-top-color:#059669">
+        <div class="stat-box-num" style="color:#059669" id="st-partners">—</div>
+        <div class="stat-box-lbl">Partenaires</div>
+      </div>
     </div>
 
-    <div class="partner-grid">
-
-      <!-- UMMISCO -->
-      <div class="partner-card">
-        <img src="../images/logo-ummisco.png" alt="UMMISCO" class="partner-card-logo"/>
-        <div>
-          <div class="partner-card-name">UMMISCO</div>
-          <div style="margin:6px 0"><span class="partner-card-type" style="background:#dbeafe;color:#1e40af">Institutionnel</span></div>
-          <div class="partner-card-desc">Unité Mixte Internationale de Modélisation Mathématique et Informatique des Systèmes Complexes — IRD/UCAD.</div>
-        </div>
-        <a href="https://ummisco.ird.fr" target="_blank" class="btn btn--outline btn--sm">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Visiter
-        </a>
+    <!-- Filter by centre -->
+    <div class="filters-bar">
+      <div>
+        <label style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--c-text3);display:block;margin-bottom:4px">Filtrer par centre</label>
+        <select id="f-centre" class="form-input" onchange="render()" style="min-width:220px">
+          <option value="">Tous les centres</option>
+        </select>
       </div>
-
-      <!-- ESP -->
-      <div class="partner-card">
-        <img src="../images/esp.jpg" alt="ESP Dakar" class="partner-card-logo"/>
-        <div>
-          <div class="partner-card-name">ESP — École Supérieure Polytechnique</div>
-          <div style="margin:6px 0"><span class="partner-card-type" style="background:#d1fae5;color:#065f46">Académique</span></div>
-          <div class="partner-card-desc">École d'ingénieurs de l'Université Cheikh Anta Diop de Dakar. Structure d'accueil principale de l'UMMISCO au Sénégal.</div>
-        </div>
-        <a href="https://esp.ucad.sn" target="_blank" class="btn btn--outline btn--sm">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Visiter
-        </a>
-      </div>
-
-      <!-- UCAD -->
-      <div class="partner-card">
-        <img src="../images/logo-ucad.png" alt="UCAD" class="partner-card-logo"/>
-        <div>
-          <div class="partner-card-name">UCAD — Université Cheikh Anta Diop</div>
-          <div style="margin:6px 0"><span class="partner-card-type" style="background:#d1fae5;color:#065f46">Académique</span></div>
-          <div class="partner-card-desc">Première université du Sénégal, fondée en 1957 à Dakar. Tutelle principale de l'UMMISCO au niveau national.</div>
-        </div>
-        <a href="https://ucad.sn" target="_blank" class="btn btn--outline btn--sm">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Visiter
-        </a>
-      </div>
-
-      <!-- IRD -->
-      <div class="partner-card">
-        <img src="../images/ird.png" alt="IRD" class="partner-card-logo"/>
-        <div>
-          <div class="partner-card-name">IRD — Institut de Recherche pour le Développement</div>
-          <div style="margin:6px 0"><span class="partner-card-type" style="background:#dbeafe;color:#1e40af">Institutionnel</span></div>
-          <div class="partner-card-desc">Organisme français de recherche pour le développement. Co-tutelle internationale de l'UMMISCO avec l'UCAD.</div>
-        </div>
-        <a href="https://ird.fr" target="_blank" class="btn btn--outline btn--sm">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Visiter
-        </a>
-      </div>
-
-      <!-- UGB -->
-      <div class="partner-card">
-        <img src="../images/ugb.jpg" alt="UGB" class="partner-card-logo"/>
-        <div>
-          <div class="partner-card-name">UGB — Université Gaston Berger</div>
-          <div style="margin:6px 0"><span class="partner-card-type" style="background:#d1fae5;color:#065f46">Académique</span></div>
-          <div class="partner-card-desc">Université publique sénégalaise de Saint-Louis, partenaire de recherche de l'UMMISCO sur plusieurs projets scientifiques.</div>
-        </div>
-        <a href="https://ugb.edu.sn" target="_blank" class="btn btn--outline btn--sm">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Visiter
-        </a>
-      </div>
-
+      <button class="btn btn--ghost btn--sm" onclick="resetFilters()" style="align-self:flex-end">Réinitialiser</button>
     </div>
+
+    <!-- Per-centre partner groups -->
+    <div id="partners-root">
+      <div class="skeleton" style="height:180px;margin-bottom:24px"></div>
+      <div class="skeleton" style="height:180px;margin-bottom:24px"></div>
+    </div>
+
   </div>
 </div>
 
 <script src="../js/api.js"></script>
 <script src="../js/nav.js"></script>
-<script>initNav({ active:'unite', base:'../' }); initFooter({ base:'../' });</script>
+<script>
+initNav({ active: 'centres', base: '../' });
+initFooter({ base: '../' });
+
+const API_URL = 'https://ummisco.fr/fr/wp-json/eventin-carte/v1/centres';
+
+let centresData = [];
+
+// ── Load ──────────────────────────────────────────────────────
+
+async function load() {
+  try {
+    const res  = await fetch(API_URL);
+    const json = await res.json();
+    centresData = Array.isArray(json) ? json : (json.data || []);
+
+    // Count unique tutelles and partenaires
+    const seenTutelles  = new Set();
+    const seenPartners  = new Set();
+    centresData.forEach(c => {
+      (c.tutelles    || []).forEach(t => t.logo && seenTutelles.add(t.logo));
+      (c.partenaires || []).forEach(p => p.logo && seenPartners.add(p.logo));
+    });
+
+    document.getElementById('st-centres').textContent  = centresData.length;
+    document.getElementById('st-tutelles').textContent  = seenTutelles.size;
+    document.getElementById('st-partners').textContent  = seenPartners.size;
+
+    // Populate centre dropdown
+    const sel = document.getElementById('f-centre');
+    centresData.forEach(c => {
+      const name = c.nom || c.title || c.post_title || '';
+      if (!name) return;
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      sel.appendChild(opt);
+    });
+
+    render();
+  } catch (err) {
+    console.error('Erreur chargement partenaires:', err);
+    document.getElementById('partners-root').innerHTML =
+      '<p style="text-align:center;padding:48px;color:var(--c-text3)">Impossible de charger les partenaires.</p>';
+  }
+}
+
+// ── Render ────────────────────────────────────────────────────
+
+function render() {
+  const fCentre = document.getElementById('f-centre').value;
+  const filtered = fCentre
+    ? centresData.filter(c => (c.nom || c.title || c.post_title) === fCentre)
+    : centresData;
+
+  const root = document.getElementById('partners-root');
+
+  if (!filtered.length) {
+    root.innerHTML = '<p style="text-align:center;padding:48px;color:var(--c-text3)">Aucun centre trouvé.</p>';
+    return;
+  }
+
+  root.innerHTML = filtered.map(centre => {
+    const centreName = centre.nom || centre.title || centre.post_title || 'Centre';
+    const tutelles   = centre.tutelles   || [];
+    const partners   = centre.partenaires || [];
+
+    const hasTutelles = tutelles.length > 0;
+    const hasPartners = partners.length > 0;
+
+    if (!hasTutelles && !hasPartners) return '';
+
+    const tutellesHtml = hasTutelles ? `
+      <div class="logo-group-title">Tutelles</div>
+      <div class="logos-grid">
+        ${tutelles.map(t => logoCard(t, '#1e40af', '#dbeafe')).join('')}
+      </div>` : '';
+
+    const partnersHtml = hasPartners ? `
+      <div class="logo-group-title" style="margin-top:${hasTutelles ? '20px' : '0'}">Partenaires</div>
+      <div class="logos-grid">
+        ${partners.map(p => logoCard(p, '#065f46', '#d1fae5')).join('')}
+      </div>` : '';
+
+    return `
+      <div class="section-centre">
+        <div class="section-centre-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          ${centreName}
+          <span class="centre-badge">${tutelles.length + partners.length} logos</span>
+        </div>
+        ${tutellesHtml}
+        ${partnersHtml}
+      </div>`;
+  }).join('');
+}
+
+function logoCard(item, badgeColor, badgeBg) {
+  const name = item.name || '';
+  const logo = item.logo || '';
+  const imgHtml = logo
+    ? `<img src="${logo}" alt="${name}" loading="lazy"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+       <div class="logo-placeholder" style="display:none">
+         <span>${name.slice(0, 2).toUpperCase() || '?'}</span>
+       </div>`
+    : `<div class="logo-placeholder"><span>${name.slice(0, 2).toUpperCase() || '?'}</span></div>`;
+
+  return `
+    <div class="logo-card">
+      ${imgHtml}
+      ${name ? `<div class="logo-card-name">${name}</div>` : ''}
+    </div>`;
+}
+
+function resetFilters() {
+  document.getElementById('f-centre').value = '';
+  render();
+}
+
+// ── Start ─────────────────────────────────────────────────────
+load();
+</script>
 <script src="../js/i18n.js"></script>
 </body>
 </html>

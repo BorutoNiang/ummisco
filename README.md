@@ -1,153 +1,99 @@
-# Portail UMMISCO — Documentation générale
+# Portail UMMISCO — Projet IPDL DIC1 · ESP/UCAD
 
-> Portail institutionnel de l'Unité Mixte Internationale de Modélisation Mathématique et Informatique des Systèmes Complexes (UMMISCO) · ESP/UCAD · Dakar, Sénégal  
-> Projet IPDL DIC1 · École Supérieure Polytechnique
+Portail institutionnel de l'UMI 209 UMMISCO (Unité Mixte Internationale de Modélisation et Simulation pour le Changement de la Science).
 
----
-
-## Vue d'ensemble
-
-Le portail UMMISCO est une application web full-stack permettant de gérer et publier les travaux scientifiques de l'unité : publications, datasets, projets, actualités, événements et outils de simulation.
-
-### Architecture
-
-```
-projetipdl/
-├── ummisco_backend/     # API REST — Python / FastAPI / MySQL
-├── ummisco_frontend/    # Interface web — HTML / CSS / JavaScript Vanilla
-├── README.md            # Ce fichier
-```
-
-### Stack technique
+## Stack technique
 
 | Composant | Technologie |
 |---|---|
-| Backend | Python 3.13, FastAPI 0.111, SQLAlchemy 2.0 |
-| Base de données | MySQL 8.0 (utf8mb4) |
-| Authentification | JWT (access + refresh tokens), bcrypt |
-| Frontend | HTML5, CSS3, JavaScript ES6 (Vanilla) |
-| Serveur dev frontend | Python http.server |
-| Serveur dev backend | Uvicorn avec --reload |
+| Frontend | HTML5 · CSS3 · JavaScript Vanilla |
+| Backend | FastAPI (Python 3.11) |
+| Base de données | MySQL 8 |
+| ORM | SQLAlchemy 2 |
+| Auth | JWT (access + refresh tokens) |
+| IA Chat | Groq API (Llama 3.3 70B) |
+| Génération docs | ReportLab · python-docx · openpyxl |
 
----
+## Structure du projet
 
-## Prérequis
-
-- Python 3.10+
-- MySQL 8.0+
-- Navigateur moderne (Chrome, Firefox, Edge)
-
----
-
-## Installation rapide
-
-### 1. Cloner le projet
-
-```bash
-git clone <url-du-repo>
-cd projetipdl
+```
+projetipdl/
+├── ummisco_backend/       # API FastAPI
+│   ├── app/
+│   │   ├── core/          # config, database, security
+│   │   ├── models/        # SQLAlchemy models
+│   │   ├── routers/       # auth, publications, datasets, chat, documents…
+│   │   ├── schemas/       # Pydantic schemas
+│   │   ├── services/      # seed, init_db
+│   │   └── templates/     # Templates Word/Excel pour génération de documents
+│   └── requirements.txt
+└── ummisco_frontend/      # Interface web statique
+    ├── css/global.css
+    ├── images/
+    ├── js/                # api.js, nav.js, admin-layout.js, i18n.js
+    └── pages/
+        ├── admin/         # Dashboard, publications, bon-achat, convention-stage…
+        └── *.html         # Pages publiques
 ```
 
-### 2. Lancer le backend
+## Démarrage rapide
 
+### Backend
 ```bash
 cd ummisco_backend
-
-# Créer l'environnement virtuel
 python -m venv venv
 venv\Scripts\activate          # Windows
-# source venv/bin/activate     # Linux/Mac
-
-# Installer les dépendances
 pip install -r requirements.txt
-
-# Configurer l'environnement
-cp .env.example .env
-# Éditer .env : renseigner DB_PASSWORD, SECRET_KEY
-
-# Créer la base de données MySQL
-mysql -u root -p -e "CREATE DATABASE ummisco_portail CHARACTER SET utf8mb4;"
-
-# Initialiser les tables et données de démo
-python -m app.services.init_db
-
-# Lancer le serveur
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+python -m app.services.seed    # Seed initial (idempotent)
+uvicorn app.main:app --reload --port 8000
 ```
 
-### 3. Lancer le frontend
-
+### Frontend
 ```bash
 cd ummisco_frontend
 python -m http.server 5500
 ```
 
-### 4. Accéder à l'application
+- Frontend → http://localhost:5500
+- API docs → http://localhost:8000/api/docs
 
-| URL | Description |
-|---|---|
-| http://127.0.0.1:5500/index.html | Page d'accueil publique |
-| http://127.0.0.1:5500/pages/login.html | Connexion |
-| http://127.0.0.1:5500/pages/admin/dashboard.html | Back-office |
-| http://localhost:8000/api/docs | Documentation API (Swagger) |
-
----
-
-## Comptes de test
+## Comptes de démonstration
 
 | Email | Mot de passe | Rôle |
 |---|---|---|
-| admin@ummisco.ucad.sn | Admin@1234 | Super administrateur |
+| admin@ummisco.ucad.sn | Admin@1234 | Directeur (super_admin) |
 | chercheur@ummisco.ucad.sn | Demo@1234 | Chercheur |
 | doctorant@ummisco.ucad.sn | Demo@1234 | Doctorant |
 
----
-
-## Fonctionnalités principales
+## Fonctionnalités
 
 ### Portail public
-- Page d'accueil avec slider, actualités, événements, rubriques thématiques, chiffres UMMISCO, partenaires
-- 5 axes thématiques de recherche avec statistiques et outils associés
-- Publications filtrables par axe, auteur, revue avec visualisation PDF
-- Datasets avec contrôle d'accès par visibilité (public / protégé / privé)
-- Projets de recherche avec progression temporelle
-- Actualités avec images, sidebar événements
-- Pages équipe, partenaires, contact, présentation
-- **Traduction FR/EN** via boutons dans la topbar
+- Page d'accueil avec chiffres clés, thèmes, centres, tutelles
+- Chat IA (Groq · Llama 3.3) avec contexte UMMISCO complet
+- Équipe : 94 membres réels depuis l'API ummisco.fr avec photos
+- Projets : 29 projets réels avec logos et filtres
+- Partenaires : tutelles et partenaires par centre
+- Thèmes : 4 axes avec descriptions et images
+- Publications, datasets, actualités, intégrations
 
-### Back-office (espace membres)
-- Dashboard avec KPIs, soumissions en attente, activité récente
-- CRUD complet sur toutes les ressources
-- Workflow de validation pour les soumissions doctorants
-- Gestion des rôles et permissions ACL
-- Upload fichiers (PDF, datasets, délivrables)
-- Intégrations outils via iframes (Evelop, Osman, Capteurs)
+### Back-office (Directeur)
+- Dashboard avec KPIs et validation des soumissions
+- Gestion publications, datasets, projets, actualités, utilisateurs
+- Génération de documents officiels :
+  - **Bon d'achat** (DEMANDE D'ACHAT.docx)
+  - **Convention de stage** (.docx rempli)
+  - **Reçu de prestation de service** (.xlsx rempli)
+- Import de publications via DOI (API Crossref)
+- Rôles & permissions
 
-### Workflow de validation (doctorant → chercheur)
+## Variables d'environnement
 
-| Ressource | Soumis par doctorant | État initial | Action chercheur |
-|---|---|---|---|
-| Publication | ✓ | en_attente | Approuver / Rejeter |
-| Actualité | ✓ | en_attente | Approuver / Rejeter |
-| Dataset | ✓ | privé | Changer visibilité |
-| Projet | ✓ | suspendu | Activer |
-| Intégration | ✓ | inactif | Activer (toggle) |
-
----
-
-## Rôles et droits
-
-| Action | super_admin | admin_axe | chercheur | doctorant |
-|---|---|---|---|---|
-| Publication directe | ✓ | ✓ | ✓ | — |
-| Soumission (avec validation) | ✓ | ✓ | ✓ | ✓ |
-| Valider soumissions | ✓ | ✓ | ✓ | — |
-| Gérer intégrations | ✓ | ✓ | ✓ | Proposer |
-| Gérer utilisateurs/rôles | ✓ | — | — | — |
-| Gérer bailleurs | ✓ | ✓ | ✓ | — |
-
----
-
-## Auteurs
-
-Projet IPDL DIC1 · École Supérieure Polytechnique (ESP) · UCAD · Dakar, Sénégal
+```env
+DB_HOST=localhost
+DB_NAME=ummisco_portail
+DB_USER=root
+DB_PASSWORD=
+SECRET_KEY=your_secret_key
+GROQ_API_KEY=gsk_...
+GROQ_MODEL=llama-3.3-70b-versatile
+```

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Convention de stage — UMMISCO Admin</title>
+  <link rel="stylesheet" href="../../css/global.css"/>
+  <style>
+    .doc-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:900px){ .doc-grid{grid-template-columns:1fr;} }
+    .section-card { background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:20px; margin-bottom:16px; }
+    .section-title { font-size:13px; font-weight:700; color:#1e293b; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; gap:8px; }
+    .section-title svg { color:#003f87; }
+    .spinner { width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:inline-block; }
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+
+<div class="section-card">
+  <div class="section-title">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Établissement d'enseignement
+  </div>
+  <div class="doc-grid gap-form">
+    <div class="form-group">
+      <label class="form-label">Nom de l'établissement</label>
+      <input class="form-input" id="cs-nom-etab" type="text" placeholder="Ex: ESP / UCAD"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Statut juridique</label>
+      <input class="form-input" id="cs-statut" type="text" placeholder="Ex: Université publique"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Siège</label>
+      <input class="form-input" id="cs-siege" type="text" placeholder="Ex: Dakar, Sénégal"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Représentant légal</label>
+      <input class="form-input" id="cs-representant" type="text" placeholder="Nom et fonction"/>
+    </div>
+  </div>
+</div>
+
+<div class="section-card">
+  <div class="section-title">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Informations du stagiaire
+  </div>
+  <div class="doc-grid gap-form">
+    <div class="form-group">
+      <label class="form-label">Nom</label>
+      <input class="form-input" id="cs-nom" type="text" placeholder="NOM"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Prénom(s)</label>
+      <input class="form-input" id="cs-prenom" type="text" placeholder="Prénom"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Adresse</label>
+      <input class="form-input" id="cs-adresse" type="text" placeholder="Adresse complète"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Téléphone</label>
+      <input class="form-input" id="cs-tel" type="text" placeholder="Ex: 77 000 00 00"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" id="cs-email" type="email" placeholder="stagiaire@email.com"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Année universitaire</label>
+      <input class="form-input" id="cs-annee" type="text" placeholder="Ex: 2025-2026"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Diplôme préparé</label>
+      <input class="form-input" id="cs-diplome" type="text" placeholder="Ex: Master 2"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Spécialité</label>
+      <input class="form-input" id="cs-specialite" type="text" placeholder="Ex: Informatique"/>
+    </div>
+  </div>
+</div>
+
+<div class="section-card">
+  <div class="section-title">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Détails du stage
+  </div>
+  <div class="doc-grid gap-form">
+    <div class="form-group">
+      <label class="form-label">Date de début</label>
+      <input class="form-input" id="cs-debut" type="date"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Date de fin</label>
+      <input class="form-input" id="cs-fin" type="date"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Lieu de stage</label>
+      <input class="form-input" id="cs-lieu" type="text" placeholder="Ex: UMMISCO — Dakar"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Structure d'accueil</label>
+      <input class="form-input" id="cs-structure" type="text" placeholder="Ex: UMMISCO / IRD"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Encadrant</label>
+      <input class="form-input" id="cs-encadrant" type="text" placeholder="Nom de l'encadrant"/>
+    </div>
+  </div>
+</div>
+
+<div class="section-card">
+  <div class="section-title">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    Gratification
+  </div>
+  <div class="doc-grid gap-form">
+    <div class="form-group">
+      <label class="form-label">Montant mensuel (FCFA)</label>
+      <input class="form-input" id="cs-montant" type="number" placeholder="0"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Transport (FCFA)</label>
+      <input class="form-input" id="cs-transport" type="number" placeholder="0"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Restauration (FCFA)</label>
+      <input class="form-input" id="cs-restauration" type="number" placeholder="0"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Imputation / EOTP</label>
+      <input class="form-input" id="cs-imputation" type="text" placeholder="Code d'imputation"/>
+    </div>
+  </div>
+</div>
+
+<div style="display:flex;gap:10px">
+  <button class="btn btn--primary" id="cs-btn" onclick="genererPDF()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Générer PDF
+  </button>
+  <button class="btn btn--ghost" onclick="resetForm()">Réinitialiser</button>
+</div>
+
+<script src="../../js/api.js"></script>
+<script src="../../js/admin-layout.js"></script>
+<script>
+initAdminLayout('convention-stage');
+
+function getData() {
+  return {
+    nom_etablissement: document.getElementById('cs-nom-etab').value,
+    statut_juridique:  document.getElementById('cs-statut').value,
+    siege:             document.getElementById('cs-siege').value,
+    representant:      document.getElementById('cs-representant').value,
+    nom_stagiaire:     document.getElementById('cs-nom').value,
+    prenom_stagiaire:  document.getElementById('cs-prenom').value,
+    adresse_stagiaire: document.getElementById('cs-adresse').value,
+    tel_stagiaire:     document.getElementById('cs-tel').value,
+    email_stagiaire:   document.getElementById('cs-email').value,
+    annee_universitaire: document.getElementById('cs-annee').value,
+    diplome:           document.getElementById('cs-diplome').value,
+    specialite:        document.getElementById('cs-specialite').value,
+    date_debut:        document.getElementById('cs-debut').value,
+    date_fin:          document.getElementById('cs-fin').value,
+    lieu_stage:        document.getElementById('cs-lieu').value,
+    structure_accueil: document.getElementById('cs-structure').value,
+    encadrant:         document.getElementById('cs-encadrant').value,
+    montant_mensuel:   document.getElementById('cs-montant').value,
+    transport:         document.getElementById('cs-transport').value,
+    restauration:      document.getElementById('cs-restauration').value,
+    imputation:        document.getElementById('cs-imputation').value,
+  };
+}
+
+async function genererPDF() {
+  const btn = document.getElementById('cs-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Génération…';
+  try {
+    await api.download('/documents/convention-stage/docx', getData(), 'convention-stage.docx');
+    Toast.success('PDF généré avec succès');
+  } catch(e) {
+    Toast.error('Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Générer PDF';
+  }
+}
+
+function resetForm() {
+  document.querySelectorAll('.form-input').forEach(el => el.value = '');
+}
+</script>
+</body>
+</html>

@@ -21,6 +21,8 @@ from app.routers.bailleurs import bailleurs_router, delivrables_router
 from app.routers.actualites import router as actualites_router
 from app.routers.evenements_integrations import evenements_router, integrations_router
 from app.routers.admin import router as admin_router
+from app.routers.documents import router as documents_router
+from app.routers.chat import router as chat_router
 
 # ── Création des tables (dev) ─────────────────────────────────
 # En production, utiliser Alembic : alembic upgrade head
@@ -66,6 +68,8 @@ app.include_router(actualites_router,    prefix=PREFIX)
 app.include_router(evenements_router,    prefix=PREFIX)
 app.include_router(integrations_router,  prefix=PREFIX)
 app.include_router(admin_router,         prefix=PREFIX)
+app.include_router(documents_router,     prefix=PREFIX)
+app.include_router(chat_router,          prefix=PREFIX)
 
 
 @app.get("/", tags=["Santé"])

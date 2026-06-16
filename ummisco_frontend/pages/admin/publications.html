@@ -92,7 +92,14 @@
       </div>
       <div class="form-group">
         <label class="form-label">DOI</label>
-        <input class="form-input" id="f-doi" placeholder="10.xxxx/xxxxx"/>
+        <div style="display:flex;gap:8px">
+          <input class="form-input" id="f-doi" placeholder="10.xxxx/xxxxx" style="flex:1"/>
+          <button type="button" class="btn btn--ghost btn--sm" id="doi-import-btn" onclick="importDoi()" title="Récupérer les métadonnées via DOI">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Importer
+          </button>
+        </div>
+        <div id="doi-status" style="font-size:11px;margin-top:4px"></div>
       </div>
       <div class="form-group">
         <label class="form-label">URL Google Scholar</label>
@@ -215,6 +222,67 @@ async function deletePub(id){if(!confirm('Supprimer cette publication ?'))return
 
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
 document.getElementById('modal-valid').addEventListener('click',e=>{if(e.target.id==='modal-valid')closeValidModal();});
+
+async function importDoi() {
+  const doi = document.getElementById('f-doi').value.trim();
+  if (!doi) { alert('Entrez un DOI d\'abord.'); return; }
+  const btn = document.getElementById('doi-import-btn');
+  const status = document.getElementById('doi-status');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:13px;height:13px;border-width:2px"></div>';
+  status.textContent = 'Recherche en cours…';
+  status.style.color = '#94a3b8';
+  try {
+    // Crossref API — publique, pas de clé requise
+    const cleanDoi = doi.replace(/^https?:\/\/doi\.org\//i, '');
+    const resp = await fetch(`https://api.crossref.org/works/${encodeURIComponent(cleanDoi)}`);
+    if (!resp.ok) throw new Error('DOI introuvable');
+    const data = await resp.json();
+    const w = data.message;
+
+    // Titre
+    if (w.title?.[0]) document.getElementById('f-titre').value = w.title[0];
+
+    // Résumé (souvent absent)
+    if (w.abstract) {
+      // Nettoyer les balises JATS éventuelles
+      const clean = w.abstract.replace(/<[^>]+>/g, '').trim();
+      document.getElementById('f-resume').value = clean;
+    }
+
+    // Revue
+    const journal = w['container-title']?.[0] || w['short-container-title']?.[0] || '';
+    if (journal) document.getElementById('f-revue').value = journal;
+
+    // Année
+    const year = w.published?.['date-parts']?.[0]?.[0]
+               || w['published-print']?.['date-parts']?.[0]?.[0]
+               || w['published-online']?.['date-parts']?.[0]?.[0];
+    if (year) document.getElementById('f-annee').value = year;
+
+    // URL Scholar / DOI
+    if (w.URL) document.getElementById('f-scholar').value = w.URL;
+    document.getElementById('f-doi').value = cleanDoi;
+
+    // Peer reviewed si type journal article
+    if (w.type === 'journal-article') document.getElementById('f-peer').checked = true;
+
+    // Résumé auteurs
+    const authors = (w.author || []).map(a => `${a.given||''} ${a.family||''}`.trim()).filter(Boolean);
+    status.textContent = authors.length
+      ? `✓ Importé — Auteurs : ${authors.slice(0,3).join(', ')}${authors.length>3?'…':''}`
+      : '✓ Métadonnées importées';
+    status.style.color = '#16a34a';
+    Toast.success('Métadonnées importées depuis Crossref');
+  } catch(e) {
+    status.textContent = '✗ ' + (e.message === 'DOI introuvable' ? 'DOI non trouvé sur Crossref' : 'Erreur réseau');
+    status.style.color = '#dc2626';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Importer';
+  }
+}
+
 init();
 </script>
 </body>

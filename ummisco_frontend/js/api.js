@@ -78,6 +78,40 @@ const api = {
     if (!res.ok) { const e = await res.json(); throw new Error(e.detail); }
     return res.json();
   },
+
+  // Téléchargement binaire (docx, xlsx, pdf, etc.)
+  download: async (path, body, filename) => {
+    const headers = { 'Content-Type': 'application/json' };
+    if (Auth.isLoggedIn()) headers['Authorization'] = `Bearer ${Auth.getToken()}`;
+    let res = await fetch(`${API_BASE}${path}`, {
+      method: 'POST', headers, body: JSON.stringify(body)
+    });
+    if (res.status === 401 && Auth.getRefresh()) {
+      const r = await fetch(`${API_BASE}/auth/refresh`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: Auth.getRefresh() }),
+      });
+      if (r.ok) {
+        const data = await r.json();
+        Auth.setTokens(data.access_token, data.refresh_token);
+        headers['Authorization'] = `Bearer ${data.access_token}`;
+        res = await fetch(`${API_BASE}${path}`, { method: 'POST', headers, body: JSON.stringify(body) });
+      } else {
+        Auth.clear();
+        window.location.href = '../login.html';
+        return;
+      }
+    }
+    if (!res.ok) {
+      let err; try { err = await res.json(); } catch { err = { detail: 'Erreur réseau' }; }
+      throw new Error(err.detail || `Erreur ${res.status}`);
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  },
 };
 
 // ── Toast notifications ───────────────────────────────────────

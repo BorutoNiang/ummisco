@@ -33,6 +33,10 @@ class Settings(BaseSettings):
     APP_PORT: int = 8000
     CORS_ORIGINS: str = "http://localhost:3000"
 
+    # Groq AI
+    GROQ_API_KEY: str = ""
+    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+
     @property
     def database_url(self) -> str:
         return (

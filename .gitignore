@@ -44,3 +44,6 @@ node_modules/
 
 # Scripts temporaires
 ummisco_backend/add_*.py
+
+# Cache données externes
+ummisco_api_data.json

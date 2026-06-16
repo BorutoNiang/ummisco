@@ -276,7 +276,7 @@ CREATE TABLE integration_externe (
 
 -- Rôles de base
 INSERT INTO role (libelle, description) VALUES
-  ('super_admin',  'Contrôle total du système'),
+  ('super_admin',  'Directeur — Contrôle total du système'),
   ('admin_axe',    'Administration d'un axe thématique'),
   ('chercheur',    'Publie directement, gère ses données'),
   ('doctorant',    'Publications soumises à validation'),

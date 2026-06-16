@@ -37,6 +37,18 @@ const ADMIN_NAV = [
     id:'roles', label:'Rôles & Permissions', href:'roles.html', roles:['super_admin'],
     svg:'<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
   },
+  {
+    id:'bon-achat', label:"Bon d'achat", href:'bon-achat.html', roles:['super_admin'],
+    svg:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>'
+  },
+  {
+    id:'convention-stage', label:'Convention de stage', href:'convention-stage.html', roles:['super_admin'],
+    svg:'<path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>'
+  },
+  {
+    id:'prestation-service', label:'Prestation de service', href:'prestation-service.html', roles:['super_admin'],
+    svg:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>'
+  },
 ];
 
 function initAdminLayout(activeId) {
@@ -82,7 +94,6 @@ function initAdminLayout(activeId) {
     }
     .sidebar-brand-logo {
       width: 36px; height: 36px;
-      background: #003f87;
       border-radius: 8px;
       display: flex;
       align-items: center;
@@ -428,7 +439,7 @@ function initAdminLayout(activeId) {
   sidebar.innerHTML = `
     <div class="sidebar-brand">
       <div class="sidebar-brand-logo">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+        <img src="../../images/logo-ummisco-officiel.webp" alt="UMMISCO" style="width:36px;height:36px;object-fit:contain;border-radius:8px"/>
       </div>
       <div>
         <div class="sidebar-brand-name">UMMISCO</div>
@@ -441,10 +452,10 @@ function initAdminLayout(activeId) {
     </nav>
     <div class="sidebar-user">
       <div class="sidebar-user-row">
-        <div class="sidebar-avatar">${avatarInitials(user?.nom, user?.prenom)}</div>
+        <img src="../../images/logo-ummisco-officiel.webp" alt="UMMISCO" style="width:34px;height:34px;border-radius:50%;object-fit:contain;flex-shrink:0;border:1px solid #e2e8f0"/>
         <div>
           <div class="sidebar-user-name">${user?.prenom || ''} ${user?.nom || ''}</div>
-          <div class="sidebar-user-role">${role}</div>
+          <div class="sidebar-user-role">${role === 'super_admin' ? 'Directeur' : role}</div>
         </div>
       </div>
       <button class="sidebar-logout-btn" onclick="logout()">
@@ -468,7 +479,7 @@ function initAdminLayout(activeId) {
         Portail public
       </a>
       <div class="topbar-user-chip">
-        <div class="topbar-avatar">${avatarInitials(user?.nom, user?.prenom)}</div>
+        <img src="../../images/logo-ummisco-officiel.webp" alt="UMMISCO" style="width:28px;height:28px;border-radius:50%;object-fit:contain;border:1px solid #e2e8f0"/>
         ${user?.prenom || ''} ${user?.nom || ''}
       </div>
     </div>`;

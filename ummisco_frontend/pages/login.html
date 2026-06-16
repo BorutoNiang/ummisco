@@ -4,133 +4,176 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Connexion — UMMISCO</title>
-  <link rel="stylesheet" href="../css/global.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"/>
   <style>
-    body { background: var(--c-surface); min-height: 100vh; display: flex; flex-direction: column; }
-    .login-topbar {
-      background: var(--c-primary);
-      height: 36px; display: flex; align-items: center;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      background: #e8f0f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
     }
-    .login-topbar .container { display: flex; justify-content: space-between; width: 100%; }
-    .login-topbar span, .login-topbar a { font-size: 12px; color: rgba(255,255,255,.8); }
-    .login-topbar a:hover { color: #fff; }
-    .login-header {
-      background: #fff; border-bottom: 3px solid var(--c-accent);
-      padding: 14px 0; box-shadow: var(--shadow-sm);
+
+    .login-wrap { width: 100%; max-width: 380px; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12px; font-weight: 600; color: #888;
+      text-decoration: none; margin-bottom: 24px;
+      transition: color .15s;
     }
-    .login-header .container { display: flex; align-items: center; gap: 16px; }
-    .login-main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
-    .login-wrap { width: 100%; max-width: 420px; }
-    .login-card {
-      background: #fff;
-      border: 1px solid var(--c-border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
+    .back-link:hover { color: #2a7abf; }
+
+    .login-title { font-size: 1.6rem; font-weight: 700; color: #111; margin-bottom: 4px; }
+    .login-sub   { font-size: 13px; color: #888; margin-bottom: 24px; }
+
+    .alert {
+      padding: 11px 14px; border-radius: 10px;
+      font-size: 13px; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
     }
-    .login-card-header {
-      background: var(--c-primary);
-      padding: 24px;
-      text-align: center;
+    .alert--error   { background: #fff1f1; color: #c0392b; border: 1px solid #fcc; }
+    .alert--success { background: #f0faf4; color: #1a7a45; border: 1px solid #b2dfcc; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: #333; margin-bottom: 8px;
     }
-    .login-card-header h1 { color: #fff; font-size: 1.5rem; margin-bottom: 4px; }
-    .login-card-header p  { color: rgba(255,255,255,.7); font-size: 13px; }
-    .login-card-body { padding: 28px; }
-    .eye-btn {
-      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; cursor: pointer; color: var(--c-text3); font-size: 15px; padding: 4px;
+    .form-input {
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid #dce3ed; border-radius: 10px;
+      font-size: 13px; font-family: inherit; color: #222;
+      background: #fff; outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .form-input:focus {
+      border-color: #2a7abf;
+      box-shadow: 0 0 0 3px rgba(42,122,191,.12);
     }
     .input-wrap { position: relative; }
-    .input-wrap .form-input { padding-right: 38px; }
-    .demo-section { background: var(--c-surface); border-top: 1px solid var(--c-border); padding: 20px 28px; }
-    .demo-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--c-text3); margin-bottom: 12px; }
+    .input-wrap .form-input { padding-right: 44px; }
+    .eye-btn {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: #aaa; font-size: 17px; padding: 2px;
+      transition: color .15s;
+    }
+    .eye-btn:hover { color: #2a7abf; }
+
+    .btn-submit {
+      width: 100%; padding: 12px;
+      background: #2a7abf; color: #fff;
+      border: none; border-radius: 10px;
+      font-size: 13px; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .15s;
+    }
+    .btn-submit:hover:not(:disabled) { background: #1a5f9a; }
+    .btn-submit:disabled { opacity: .65; cursor: not-allowed; }
+
+    .spinner {
+      width: 15px; height: 15px;
+      border: 2px solid rgba(255,255,255,.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .demo-section {
+      margin-top: 28px;
+      border: 1px solid #dce3ed;
+      border-radius: 14px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .demo-header {
+      padding: 13px 18px;
+      background: #f4f8fc;
+      border-bottom: 1px solid #dce3ed;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em; color: #999;
+    }
     .demo-btn {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 9px 12px; border-radius: var(--radius-sm);
-      background: #fff; border: 1px solid var(--c-border);
-      cursor: pointer; transition: all var(--transition);
-      font-size: 13px; margin-bottom: 6px;
+      padding: 14px 18px; cursor: pointer;
+      border-bottom: 1px solid #f0f3f7;
+      transition: background .12s;
     }
-    .demo-btn:last-child { margin-bottom: 0; }
-    .demo-btn:hover { border-color: var(--c-primary); background: var(--c-primary-l); }
-    .demo-btn .role-tag { font-size: 11px; font-weight: 700; color: var(--c-primary); font-family: var(--font-mono); }
-    .back-link { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--c-text3); margin-bottom: 16px; }
-    .back-link:hover { color: var(--c-primary); }
+    .demo-btn:last-child { border-bottom: none; }
+    .demo-btn:hover { background: #f0f6ff; }
+    .demo-name  { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 2px; }
+    .demo-email { font-size: 12px; color: #999; }
+    .role-tag {
+      font-size: 11px; font-weight: 700;
+      font-family: 'Courier New', monospace;
+      padding: 4px 10px; border-radius: 6px;
+      white-space: nowrap;
+    }
+    .role-tag--admin  { background: #eef4ff; color: #2a7abf; }
+    .role-tag--search { background: #f0faf4; color: #1a7a45; }
+    .role-tag--doc    { background: #fdf6ec; color: #b96a00; }
   </style>
 </head>
 <body>
 
-<div class="login-topbar">
-  <div class="container">
-    <span>🇸🇳 UMMISCO — Espace membres</span>
-    <a href="../index.html">← Retour au portail</a>
-  </div>
-</div>
+<div class="login-wrap">
 
-<div class="login-header">
-  <div class="container" style="gap:12px">
-    <a href="../index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none">
-      <img src="../images/logo-ucad.png"    alt="UCAD"    style="height:46px;width:auto;object-fit:contain"/>
-      <div style="width:1px;height:36px;background:var(--c-border)"></div>
-      <img src="../images/logo-ummisco.png" alt="UMMISCO" style="height:46px;width:auto;object-fit:contain;max-width:140px"/>
-    </a>
-    <div style="width:1px;height:36px;background:var(--c-border)"></div>
-    <div>
-      <div style="font-family:var(--font-heading);font-size:1.1rem;font-weight:700;color:var(--c-primary)">UMMISCO</div>
-      <div style="font-size:11px;color:var(--c-text3)">Portail institutionnel · ESP/UCAD · Dakar</div>
+  <a href="../index.html" class="back-link">← Retour à l'accueil</a>
+
+  <h1 class="login-title">Connexion</h1>
+  <p class="login-sub">Accédez à votre espace membres UMMISCO</p>
+
+  <div id="alert-area"></div>
+
+  <form id="login-form">
+    <div class="form-group">
+      <label class="form-label" for="email">Adresse e-mail</label>
+      <input class="form-input" type="email" id="email" placeholder="vous@ucad.sn" required autocomplete="email"/>
     </div>
-  </div>
-</div>
-
-<main class="login-main">
-  <div class="login-wrap">
-    <a href="../index.html" class="back-link">← Retour au portail public</a>
-
-    <div class="login-card">
-      <div class="login-card-header">
-        <h1>Connexion</h1>
-        <p>Accédez à votre espace membres UMMISCO</p>
-      </div>
-
-      <div class="login-card-body">
-        <div id="alert-area"></div>
-
-        <form id="login-form" class="gap-form">
-          <div class="form-group">
-            <label class="form-label" for="email">Adresse e-mail</label>
-            <input class="form-input" type="email" id="email" placeholder="vous@ucad.sn" required autocomplete="email"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="password">Mot de passe</label>
-            <div class="input-wrap">
-              <input class="form-input w-full" type="password" id="password" placeholder="••••••••" required autocomplete="current-password"/>
-              <button type="button" class="eye-btn" id="eye-btn" title="Afficher/masquer">👁</button>
-            </div>
-          </div>
-          <button type="submit" class="btn btn--primary w-full" id="submit-btn" style="justify-content:center;margin-top:4px">
-            Se connecter
-          </button>
-        </form>
-      </div>
-
-      <div class="demo-section">
-        <div class="demo-section-title">Comptes de démonstration</div>
-        <div class="demo-btn" onclick="fillDemo('admin@ummisco.ucad.sn','Admin@1234')">
-          <span>Super administrateur</span>
-          <span class="role-tag">super_admin</span>
-        </div>
-        <div class="demo-btn" onclick="fillDemo('chercheur@ummisco.ucad.sn','Demo@1234')">
-          <span>Chercheur</span>
-          <span class="role-tag">chercheur</span>
-        </div>
-        <div class="demo-btn" onclick="fillDemo('doctorant@ummisco.ucad.sn','Demo@1234')">
-          <span>Doctorant</span>
-          <span class="role-tag">doctorant</span>
-        </div>
+    <div class="form-group">
+      <label class="form-label" for="password">Mot de passe</label>
+      <div class="input-wrap">
+        <input class="form-input" type="password" id="password" placeholder="••••••••" required autocomplete="current-password"/>
+        <button type="button" class="eye-btn" id="eye-btn" title="Afficher/masquer">👁</button>
       </div>
     </div>
+    <button type="submit" class="btn-submit" id="submit-btn">Se connecter</button>
+  </form>
+
+  <div class="demo-section">
+    <div class="demo-header">Comptes de démonstration</div>
+    <div class="demo-btn" onclick="fillDemo('admin@ummisco.ucad.sn','Admin@1234')">
+      <div>
+        <div class="demo-name">Directeur</div>
+        <div class="demo-email">admin@ummisco.ucad.sn</div>
+      </div>
+      <span class="role-tag role-tag--admin">directeur</span>
+    </div>
+    <div class="demo-btn" onclick="fillDemo('chercheur@ummisco.ucad.sn','Demo@1234')">
+      <div>
+        <div class="demo-name">Chercheur</div>
+        <div class="demo-email">chercheur@ummisco.ucad.sn</div>
+      </div>
+      <span class="role-tag role-tag--search">chercheur</span>
+    </div>
+    <div class="demo-btn" onclick="fillDemo('doctorant@ummisco.ucad.sn','Demo@1234')">
+      <div>
+        <div class="demo-name">Doctorant</div>
+        <div class="demo-email">doctorant@ummisco.ucad.sn</div>
+      </div>
+      <span class="role-tag role-tag--doc">doctorant</span>
+    </div>
   </div>
-</main>
+
+</div>
 
 <script src="../js/api.js"></script>
 <script>
@@ -147,10 +190,10 @@ function fillDemo(email, pwd) {
   document.getElementById('password').value = pwd;
 }
 
-function showAlert(msg, type='error') {
-  const icons = { error:'⚠', success:'✓', info:'ℹ' };
+function showAlert(msg, type = 'error') {
+  const icons = { error: '⚠', success: '✓', info: 'ℹ' };
   document.getElementById('alert-area').innerHTML =
-    `<div class="alert alert--${type}" style="margin-bottom:16px">${icons[type]} ${msg}</div>`;
+    `<div class="alert alert--${type}">${icons[type]} ${msg}</div>`;
 }
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -159,7 +202,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px"></div> Connexion…';
+  btn.innerHTML = '<div class="spinner"></div> Connexion…';
   document.getElementById('alert-area').innerHTML = '';
   try {
     const tokens = await api.post('/auth/login', { email, password });
@@ -168,7 +211,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     Auth.setUser(user);
     showAlert(`Bienvenue, ${user.prenom} ${user.nom} !`, 'success');
     setTimeout(() => { window.location.href = 'admin/dashboard.html'; }, 700);
-  } catch(err) {
+  } catch (err) {
     showAlert(err.message || 'Identifiants invalides');
     btn.disabled = false;
     btn.textContent = 'Se connecter';

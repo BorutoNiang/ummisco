@@ -3,116 +3,171 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Axes thématiques — UMMISCO</title>
+  <title>Thèmes de recherche — UMMISCO</title>
   <link rel="stylesheet" href="../css/global.css"/>
   <style>
-    .axe-section { padding:56px 0;border-bottom:1px solid var(--c-border); }
-    .axe-section:last-child { border-bottom:none; }
-    .axe-section:nth-child(even) { background:var(--c-surface); }
-    .axe-header { display:flex;align-items:center;gap:18px;margin-bottom:32px; }
-    .axe-icon-box { width:56px;height:56px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
-    .axe-title { font-size:1.6rem;font-weight:700; }
-    .axe-subtitle { font-size:14px;color:var(--c-text2);margin-top:3px; }
-    .stat-inline { display:flex;gap:28px;margin-top:18px; }
-    .stat-inline-item { text-align:center; }
-    .stat-inline-num { font-size:1.5rem;font-weight:700; }
-    .stat-inline-lbl { font-size:11px;color:var(--c-text3);text-transform:uppercase;letter-spacing:.05em; }
-    .tool-chip { display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border:1px solid var(--c-border);border-radius:var(--radius-sm);font-size:13px;background:#fff;cursor:pointer;transition:all var(--transition); }
-    .tool-chip:hover { border-color:var(--c-primary);color:var(--c-primary);box-shadow:var(--shadow-sm); }
-    .tools-row { display:flex;gap:10px;flex-wrap:wrap;margin-top:16px; }
+    .theme-section { padding:64px 0; border-bottom:1px solid var(--c-border); }
+    .theme-section:last-child { border-bottom:none; }
+    .theme-section:nth-child(even) { background:var(--c-surface); }
+    .theme-inner { display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; }
+    .theme-inner.reverse { direction:rtl; }
+    .theme-inner.reverse > * { direction:ltr; }
+    @media(max-width:900px){ .theme-inner,.theme-inner.reverse { grid-template-columns:1fr; direction:ltr; } }
+    .theme-tag { display:inline-block; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px; }
+    .theme-title { font-size:1.7rem; font-weight:800; line-height:1.2; margin-bottom:16px; color:var(--c-text); }
+    .theme-desc { font-size:15px; color:var(--c-text2); line-height:1.85; margin-bottom:24px; }
+    .theme-img { width:100%; border-radius:16px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,.12); }
+    .theme-img img { width:100%; height:320px; object-fit:cover; display:block; }
+    .theme-projects { margin-top:20px; }
+    .theme-projects-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--c-text3); margin-bottom:10px; }
+    .project-chip { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border:1px solid var(--c-border); border-radius:6px; font-size:12px; font-weight:600; color:var(--c-text2); background:#fff; margin:3px; transition:all var(--transition); }
+    .project-chip:hover { border-color:var(--c-primary); color:var(--c-primary); }
   </style>
 </head>
 <body>
+
 <div class="page-header-inst">
   <div class="container">
-    <h1 data-i18n="page.axes.title">Axes thématiques</h1>
-    <p>Cinq domaines structurant la recherche de l'UMMISCO avec leurs outils, simulations et données</p>
+    <h1>Thèmes de recherche</h1>
+    <p>4 axes structurant la recherche de l'UMMISCO — modélisation, IA, capteurs et science participative</p>
   </div>
 </div>
 
-<div id="axes-container">
-  <div style="text-align:center;padding:80px"><div class="spinner" style="margin:0 auto"></div></div>
+<!-- ── Thème 1 : Modélisation ── -->
+<div class="theme-section" id="modelisation">
+  <div class="container">
+    <div class="theme-inner">
+      <div>
+        <span class="theme-tag" style="background:#eff6ff;color:#1d4ed8">Thème 1</span>
+        <h2 class="theme-title">Modélisation mathématique et informatique à base d'agents</h2>
+        <p class="theme-desc">
+          Ce thème couvre la modélisation mathématique (équations différentielles ordinaires, aux dérivées partielles, stochastiques) et la modélisation informatique à base d'agents. L'objectif est de développer des outils permettant d'étudier des systèmes complexes et évolutifs — épidémies, écosystèmes, dynamiques sociales — et d'en déduire des outils d'aide à la décision pour le développement durable.
+        </p>
+        <p class="theme-desc">
+          Un exemple emblématique est <strong>COMOKIT</strong>, un modèle multi-agents développé pour simuler la propagation du COVID-19 et évaluer l'efficacité des politiques de contrôle, utilisé dans plusieurs pays africains et asiatiques.
+        </p>
+        <div class="theme-projects">
+          <div class="theme-projects-title">Projets associés</div>
+          <span class="project-chip">COMOKIT</span>
+          <span class="project-chip">DiDEM</span>
+          <span class="project-chip">DigEpi</span>
+          <span class="project-chip">DOM</span>
+          <span class="project-chip">ANR MaGnuM</span>
+        </div>
+      </div>
+      <div class="theme-img">
+        <img src="https://ummisco.fr/wp-content/uploads/2024/11/laptop-ejecting-graphics-arrows-scaled.jpg"
+             alt="Modélisation mathématique à base d'agents"
+             onerror="this.src='../images/theme-modelisation.webp'"/>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Thème 2 : IA ── -->
+<div class="theme-section" id="ia">
+  <div class="container">
+    <div class="theme-inner reverse">
+      <div>
+        <span class="theme-tag" style="background:#fdf4ff;color:#7c3aed">Thème 2</span>
+        <h2 class="theme-title">Intelligence Artificielle et Apprentissage Profond</h2>
+        <p class="theme-desc">
+          Ce thème explore l'application de l'intelligence artificielle et de l'apprentissage profond aux enjeux du développement durable, de la santé, de l'environnement et de la biodiversité. Les recherches portent sur la découverte automatique de représentations complexes dans des données variées : métagénomiques, signaux ECG, images de végétation.
+        </p>
+        <p class="theme-desc">
+          Les travaux incluent des méthodes interprétables, des embeddings adaptés aux données du Sud Global, et des modèles légers déployables sur infrastructure limitée.
+        </p>
+        <div class="theme-projects">
+          <div class="theme-projects-title">Projets associés</div>
+          <span class="project-chip">AIME</span>
+          <span class="project-chip">DeepECG4U</span>
+          <span class="project-chip">DeepIntegrOmics</span>
+          <span class="project-chip">E-Col+</span>
+          <span class="project-chip">RDT Smart Reader</span>
+        </div>
+      </div>
+      <div class="theme-img">
+        <img src="https://ummisco.fr/wp-content/uploads/elementor/thumbs/img-03-rg9fit1rrfviwafjte9juynm268xeqj2slorz1u5go.jpg"
+             alt="Intelligence Artificielle et Apprentissage Profond"
+             onerror="this.src='../images/theme-ia.webp'"/>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Thème 3 : Capteurs ── -->
+<div class="theme-section" id="capteurs">
+  <div class="container">
+    <div class="theme-inner">
+      <div>
+        <span class="theme-tag" style="background:#f0fdf4;color:#166534">Thème 3</span>
+        <h2 class="theme-title">Capteurs et collecte de données</h2>
+        <p class="theme-desc">
+          Dans les pays du Sud, la rareté des données de qualité constitue un obstacle majeur à la modélisation. Ce thème développe des solutions de collecte basées sur des micro-capteurs low-cost, open-source et réparables localement — eau, air, sol — à travers des FabLabs et micro-stations connectées.
+        </p>
+        <p class="theme-desc">
+          Un exemple concret : les capteurs de qualité de l'air déployés à Dakar, reconçus pour résister aux conditions climatiques locales (humidité, chaleur) contrairement aux équipements standards conçus pour les pays du Nord.
+        </p>
+        <div class="theme-projects">
+          <div class="theme-projects-title">Projets associés</div>
+          <span class="project-chip">Waqatali</span>
+          <span class="project-chip">AIRQALY-4-ASMAFRI</span>
+          <span class="project-chip">U2worm</span>
+          <span class="project-chip">ANR SOILμ-3D</span>
+        </div>
+      </div>
+      <div class="theme-img">
+        <img src="https://ummisco.fr/wp-content/uploads/2018/08/1.png"
+             alt="Capteurs et collecte de données"
+             onerror="this.src='../images/theme-capteurs.webp'"/>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Thème 4 : Participatif ── -->
+<div class="theme-section" id="participatif">
+  <div class="container">
+    <div class="theme-inner reverse">
+      <div>
+        <span class="theme-tag" style="background:#fff7ed;color:#c2410c">Thème 4</span>
+        <h2 class="theme-title">Approches participatives et science citoyenne</h2>
+        <p class="theme-desc">
+          Ce thème explore comment les modèles peuvent devenir des supports transdisciplinaires impliquant scientifiques, parties prenantes non scientifiques et grand public. Il intègre la ludification (serious games), les interfaces tangibles et le crowdsourcing pour la production collaborative de données.
+        </p>
+        <p class="theme-desc">
+          Les recherches s'inscrivent dans les réseaux COMMOD (modélisation d'accompagnement), LPI et MIT Media Lab, et visent à démocratiser l'accès à la modélisation pour des communautés locales en Afrique et en Asie du Sud-Est.
+        </p>
+        <div class="theme-projects">
+          <div class="theme-projects-title">Projets associés</div>
+          <span class="project-chip">HABITABLE</span>
+          <span class="project-chip">DiDEM</span>
+          <span class="project-chip">SIMPLE</span>
+          <span class="project-chip">ANR ESCAPE</span>
+        </div>
+      </div>
+      <div class="theme-img">
+        <img src="https://ummisco.fr/wp-content/uploads/2018/06/app01.png"
+             alt="Approches participatives et science citoyenne"
+             onerror="this.src='../images/theme-participatif.webp'"/>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="../js/api.js"></script>
 <script src="../js/nav.js"></script>
 <script>
-initNav({ active:'recherches', base:'../' }); initFooter({ base:'../' });
+initNav({ active:'themes', base:'../' });
+initFooter({ base:'../' });
 
-const AXES_CFG = [
-  { nom:'Épidémiologie',          color:'#dc2626', bg:'#fef2f2',
-    svg:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
-    desc:'Modélisation des maladies infectieuses, analyse épidémiologique et systèmes de surveillance de santé complexes en Afrique subsaharienne.',
-    pubs:12, membres:6, datasets:4,
-    tools:['Catalogue Evelop','Simulations multi-agents SEIR'] },
-  { nom:'IoT & Science citoyenne', color:'#059669', bg:'#f0fdf4',
-    svg:'<path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/>',
-    desc:'Capteurs connectés, systèmes IoT distribués, science citoyenne participative et traitement de données en temps réel sur le campus UCAD.',
-    pubs:8, membres:5, datasets:3,
-    tools:['Dashboard capteurs végétaux','Données participatives IoT'] },
-  { nom:'Environnement',           color:'#2563eb', bg:'#eff6ff',
-    svg:'<path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="2" y1="18" x2="4" y2="18"/><line x1="20" y1="18" x2="22" y2="18"/><line x1="19.78" y1="10.22" x2="18.36" y2="11.64"/><line x1="23" y1="22" x2="1" y2="22"/><polyline points="8 6 12 2 16 6"/>',
-    desc:'Modélisation climatique, prédiction spatiale de la teneur en carbone des sols, biodiversité et gestion des ressources naturelles au Sénégal.',
-    pubs:15, membres:7, datasets:6,
-    tools:['Prédiction carbone (Osman)','Cartographie sols Sénégal'] },
-  { nom:'Cardiologie',             color:'#d97706', bg:'#fffbeb',
-    svg:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
-    desc:'Systèmes cardiaques végétaux, bio-capteurs de sève, modélisation de la santé des arbres tropicaux et instrumentation embarquée.',
-    pubs:6, membres:4, datasets:2,
-    tools:['Capteurs cardiaques végétaux','Visualisation sève temps réel'] },
-  { nom:'Géologie',                color:'#7c3aed', bg:'#f5f3ff',
-    svg:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
-    desc:'Prédiction spatiale des ressources minérales, cartographie géologique haute résolution et modélisation des sédiments au Sénégal.',
-    pubs:9, membres:5, datasets:3,
-    tools:['Cartographie géologique Dakar','SIG Sénégal'] },
-];
-
-async function init() {
-  let axes = [], integrations = [];
-  try { axes = await api.get('/axes/'); } catch { axes = AXES_CFG.map((c,i) => ({id:i+1, nom:c.nom, description:c.desc})); }
-  try { integrations = await api.get('/integrations/'); } catch {}
-
-  document.getElementById('axes-container').innerHTML = axes.map((axe, idx) => {
-    const cfg = AXES_CFG.find(c => c.nom === axe.nom) || AXES_CFG[idx % AXES_CFG.length];
-    const axeInts = integrations.filter(i => i.axe?.id === axe.id);
-    const tools = axeInts.length
-      ? axeInts.map(i => `<a class="tool-chip" href="integrations.html"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="${cfg.color}" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>${i.nom}</a>`).join('')
-      : cfg.tools.map(t => `<div class="tool-chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="${cfg.color}" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>${t}</div>`).join('');
-
-    return `<div class="axe-section">
-      <div class="container">
-        <div class="axe-header">
-          <div class="axe-icon-box" style="background:${cfg.bg}">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="${cfg.color}" stroke-width="1.8">${cfg.svg}</svg>
-          </div>
-          <div>
-            <div class="axe-title" style="color:${cfg.color}">${axe.nom}</div>
-            <div class="axe-subtitle">${axe.description || cfg.desc}</div>
-          </div>
-        </div>
-        <div class="grid-2" style="gap:40px;align-items:start">
-          <div>
-            <p style="color:var(--c-text2);font-size:14px;line-height:1.8;margin-bottom:20px">${axe.description || cfg.desc}</p>
-            <div class="stat-inline">
-              <div class="stat-inline-item"><div class="stat-inline-num" style="color:${cfg.color}">${cfg.pubs}</div><div class="stat-inline-lbl">Publications</div></div>
-              <div class="stat-inline-item"><div class="stat-inline-num" style="color:${cfg.color}">${cfg.membres}</div><div class="stat-inline-lbl">Membres</div></div>
-              <div class="stat-inline-item"><div class="stat-inline-num" style="color:${cfg.color}">${cfg.datasets}</div><div class="stat-inline-lbl">Datasets</div></div>
-            </div>
-            <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
-              <a href="publications.html" class="btn btn--outline btn--sm">Publications</a>
-              <a href="datasets.html" class="btn btn--ghost btn--sm">Datasets</a>
-            </div>
-          </div>
-          <div>
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--c-text3);margin-bottom:10px">Outils &amp; simulations</div>
-            <div class="tools-row">${tools}</div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+// Scroll vers l'ancre si présent dans l'URL
+if (window.location.hash) {
+  setTimeout(() => {
+    const el = document.querySelector(window.location.hash);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 }
-init();
 </script>
 <script src="../js/i18n.js"></script>
 </body>
