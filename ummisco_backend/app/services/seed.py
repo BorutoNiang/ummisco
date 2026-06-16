@@ -123,6 +123,34 @@ def seed():
         else:
             print("✓ Super admin déjà existant")
 
+        # ── Compte chercheur démo ─────────────────────────────
+        chercheur_email = "chercheur@ummisco.ucad.sn"
+        if not db.query(Utilisateur).filter(Utilisateur.email == chercheur_email).first():
+            db.add(Utilisateur(
+                nom="Diallo",
+                prenom="Oumar",
+                email=chercheur_email,
+                password_hash=hash_password("Demo@1234"),
+                role_id=roles["chercheur"].id,
+            ))
+            print(f"✓ Chercheur créé : {chercheur_email} / Demo@1234")
+        else:
+            print("✓ Chercheur déjà existant")
+
+        # ── Compte doctorant démo ─────────────────────────────
+        doctorant_email = "doctorant@ummisco.ucad.sn"
+        if not db.query(Utilisateur).filter(Utilisateur.email == doctorant_email).first():
+            db.add(Utilisateur(
+                nom="Ndiaye",
+                prenom="Fatou",
+                email=doctorant_email,
+                password_hash=hash_password("Demo@1234"),
+                role_id=roles["doctorant"].id,
+            ))
+            print(f"✓ Doctorant créé : {doctorant_email} / Demo@1234")
+        else:
+            print("✓ Doctorant déjà existant")
+
         # ── Axes thématiques ──────────────────────────────────
         axes_data = [
             ("Épidémiologie",          "Modélisation et analyse des maladies infectieuses", "#E53E3E"),
